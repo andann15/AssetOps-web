@@ -1,0 +1,164 @@
+<?php
+
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\DivisionController;
+use App\Http\Controllers\Admin\AssetCategoryController;
+use App\Http\Controllers\Admin\TicketPriorityController;
+use App\Http\Controllers\Admin\RejectionReasonController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\LocationController;
+use App\Http\Controllers\Admin\AssetController;
+use App\Http\Controllers\UserDashboardController;
+
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
+    ->prefix('admin/divisions')
+    ->name('admin.divisions.')
+    ->group(function () {
+        Route::get('/', [DivisionController::class, 'index'])->name('index');
+        Route::get('/create', [DivisionController::class, 'create'])->name('create');
+        Route::post('/', [DivisionController::class, 'store'])->name('store');
+        Route::get('/{division}/edit', [DivisionController::class, 'edit'])->name('edit');
+        Route::put('/{division}', [DivisionController::class, 'update'])->name('update');
+        Route::patch('/{division}/toggle', [DivisionController::class, 'toggleActive'])->name('toggle');
+    });
+Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
+    ->prefix('admin/brands')
+    ->name('admin.brands.')
+    ->group(function () {
+        Route::get('/', [BrandController::class, 'index'])->name('index');
+        Route::get('/create', [BrandController::class, 'create'])->name('create');
+        Route::post('/', [BrandController::class, 'store'])->name('store');
+        Route::get('/{brand}/edit', [BrandController::class, 'edit'])->name('edit');
+        Route::put('/{brand}', [BrandController::class, 'update'])->name('update');
+        Route::patch('/{brand}/toggle', [BrandController::class, 'toggleActive'])->name('toggle');
+    });
+
+Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
+    ->prefix('admin/locations')
+    ->name('admin.locations.')
+    ->group(function () {
+        Route::get('/', [LocationController::class, 'index'])->name('index');
+        Route::get('/create', [LocationController::class, 'create'])->name('create');
+        Route::post('/', [LocationController::class, 'store'])->name('store');
+        Route::get('/{location}/edit', [LocationController::class, 'edit'])->name('edit');
+        Route::put('/{location}', [LocationController::class, 'update'])->name('update');
+        Route::patch('/{location}/toggle', [LocationController::class, 'toggleActive'])->name('toggle');
+    });
+Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
+    ->prefix('admin/asset-categories')
+    ->name('admin.asset-categories.')
+    ->group(function () {
+        Route::get('/', [AssetCategoryController::class, 'index'])->name('index');
+        Route::get('/create', [AssetCategoryController::class, 'create'])->name('create');
+        Route::post('/', [AssetCategoryController::class, 'store'])->name('store');
+        Route::get('/{assetCategory}/edit', [AssetCategoryController::class, 'edit'])->name('edit');
+        Route::put('/{assetCategory}', [AssetCategoryController::class, 'update'])->name('update');
+        Route::patch('/{assetCategory}/toggle', [AssetCategoryController::class, 'toggleActive'])->name('toggle');
+    });
+
+Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
+    ->prefix('admin/ticket-priorities')
+    ->name('admin.ticket-priorities.')
+    ->group(function () {
+        Route::get('/', [TicketPriorityController::class, 'index'])->name('index');
+        Route::get('/create', [TicketPriorityController::class, 'create'])->name('create');
+        Route::post('/', [TicketPriorityController::class, 'store'])->name('store');
+        Route::get('/{ticketPriority}/edit', [TicketPriorityController::class, 'edit'])->name('edit');
+        Route::put('/{ticketPriority}', [TicketPriorityController::class, 'update'])->name('update');
+        Route::patch('/{ticketPriority}/toggle', [TicketPriorityController::class, 'toggleActive'])->name('toggle');
+    });
+
+Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
+    ->prefix('admin/rejection-reasons')
+    ->name('admin.rejection-reasons.')
+    ->group(function () {
+        Route::get('/', [RejectionReasonController::class, 'index'])->name('index');
+        Route::get('/create', [RejectionReasonController::class, 'create'])->name('create');
+        Route::post('/', [RejectionReasonController::class, 'store'])->name('store');
+        Route::get('/{rejectionReason}/edit', [RejectionReasonController::class, 'edit'])->name('edit');
+        Route::put('/{rejectionReason}', [RejectionReasonController::class, 'update'])->name('update');
+        Route::patch('/{rejectionReason}/toggle', [RejectionReasonController::class, 'toggleActive'])->name('toggle');
+    });
+
+Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\RoleMiddleware::class . ':admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
+    });
+
+Route::middleware(['auth'])->prefix('tickets')->name('tickets.')->group(function () {
+    Route::get('/', [TicketController::class, 'index'])->name('index');
+    Route::get('/create', [TicketController::class, 'create'])->name('create');
+    Route::post('/', [TicketController::class, 'store'])->name('store');
+    Route::get('/{ticket}', [TicketController::class, 'show'])->name('show');
+    Route::patch('/{ticket}/approve', [TicketController::class, 'approve'])->name('approve');
+    Route::patch('/{ticket}/reject', [TicketController::class, 'reject'])->name('reject');
+    Route::patch('/{ticket}/start-checking', [TicketController::class, 'startChecking'])->name('start-checking');
+    Route::patch('/{ticket}/complete', [TicketController::class, 'complete'])->name('complete');
+    Route::patch('/{ticket}/close', [TicketController::class, 'close'])->name('close');
+    Route::patch('/{ticket}/cancel', [TicketController::class, 'cancel'])->name('cancel');
+    Route::delete('/{ticket}', [TicketController::class, 'destroy'])->name('destroy');
+    });
+
+Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\RoleMiddleware::class . ':operator'])
+    ->prefix('operator')
+    ->name('operator.')
+    ->group(function () {
+        Route::get('/dashboard', function () {
+            return view('operator.dashboard');
+        })->name('dashboard');
+    });
+
+Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\RoleMiddleware::class . ':user'])
+    ->prefix('user')
+    ->name('user.')
+    ->group(function () {
+        Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
+    });
+
+Route::middleware('auth')->group(function () {
+    Route::get('/my-assets', [\App\Http\Controllers\MyAssetController::class, 'index'])->name('my-assets');
+    Route::post('/my-assets/claim', [\App\Http\Controllers\MyAssetController::class, 'claim'])->name('my-assets.claim');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::get('/admin/assets', [AssetController::class, 'index'])
+    ->middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':assets.view'])
+    ->name('admin.assets.index');
+
+Route::get('/admin/assets/create', [AssetController::class, 'create'])
+    ->middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':assets.create'])
+    ->name('admin.assets.create');
+
+Route::post('/admin/assets', [AssetController::class, 'store'])
+    ->middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':assets.create'])
+    ->name('admin.assets.store');
+
+Route::get('/admin/assets/{asset}/edit', [AssetController::class, 'edit'])
+    ->middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':assets.edit'])
+    ->name('admin.assets.edit');
+
+Route::put('/admin/assets/{asset}', [AssetController::class, 'update'])
+    ->middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':assets.edit'])
+    ->name('admin.assets.update');
+
+Route::delete('/admin/assets/{asset}', [AssetController::class, 'destroy'])
+    ->middleware(['auth', 'verified', \Spatie\Permission\Middleware\RoleMiddleware::class . ':admin'])
+    ->name('admin.assets.destroy');
+
+require __DIR__.'/auth.php';
