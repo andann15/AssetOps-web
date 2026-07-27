@@ -323,13 +323,29 @@ Karyawan juga dapat **membatalkan** tiket selama masih dalam status `waiting_app
 
 Jika Anda (atau teman Anda) ingin menjalankan dan ikut mengedit project ini di laptop masing-masing, ikuti langkah-langkah berikut:
 
-### Persyaratan Sistem Wajib
-* **XAMPP** (atau software penyedia MySQL)
-* **PHP** (minimal versi 8.2)
-* **Composer**
-* **Node.js** & **NPM**
+### 🧰 Persiapan & Instalasi Software Pendukung
+Sebelum men-download project ini, pastikan laptop Anda sudah terinstal aplikasi berikut:
 
-### Langkah-langkah
+1. **Git** (Untuk mendownload kode dari GitHub)
+   * Download di: [git-scm.com/downloads](https://git-scm.com/downloads)
+   * Cara install: Download file `.exe`, klik 2x, lalu tekan *Next* terus sampai selesai.
+2. **XAMPP** (Menyediakan PHP dan MySQL Server)
+   * Download di: [apachefriends.org](https://www.apachefriends.org/download.html)
+   * **Penting:** Pastikan Anda men-download versi XAMPP yang mendukung **PHP 8.2** atau yang lebih baru.
+   * Cara install: Install seperti biasa (tekan *Next*). Setelah selesai, buka XAMPP Control Panel lalu klik **Start** pada modul `Apache` dan `MySQL`.
+3. **Composer** (Untuk menginstal library Laravel)
+   * Download di: [getcomposer.org](https://getcomposer.org/download/)
+   * Cara install: Download `Composer-Setup.exe`, klik 2x, tekan *Next* sampai selesai.
+4. **Node.js** (Untuk mengolah desain TailwindCSS/Vite)
+   * Download di: [nodejs.org](https://nodejs.org/en/)
+   * Pilih versi **LTS** (Long Term Support).
+   * Cara install: Install seperti biasa (*Next* sampai selesai).
+5. **Visual Studio Code** (Aplikasi Kode Editor)
+   * Download di: [code.visualstudio.com](https://code.visualstudio.com/)
+
+*(Catatan: Jika Anda baru saja menginstal software di atas, pastikan Anda merestart / menutup dan membuka ulang VS Code dan Terminal Anda agar software yang baru diinstal bisa terbaca oleh sistem).*
+
+### 🛠️ Langkah-langkah Menjalankan Project
 1. **Clone Repository (Download Kode)**
    Buka terminal/CMD, lalu ketik perintah berikut:
    ```bash
