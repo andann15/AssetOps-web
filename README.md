@@ -319,6 +319,78 @@ Karyawan juga dapat **membatalkan** tiket selama masih dalam status `waiting_app
 
 ---
 
+## 🚀 Cara Instalasi di Komputer Lokal (Untuk Anggota Tim)
+
+Jika Anda (atau teman Anda) ingin menjalankan dan ikut mengedit project ini di laptop masing-masing, ikuti langkah-langkah berikut:
+
+### Persyaratan Sistem Wajib
+* **XAMPP** (atau software penyedia MySQL)
+* **PHP** (minimal versi 8.2)
+* **Composer**
+* **Node.js** & **NPM**
+
+### Langkah-langkah
+1. **Clone Repository (Download Kode)**
+   Buka terminal/CMD, lalu ketik perintah berikut:
+   ```bash
+   git clone https://github.com/andann15/AssetOps-web.git
+   cd AssetOps-web
+   ```
+
+2. **Install Dependensi PHP (Library Laravel)**
+   ```bash
+   composer install
+   ```
+
+3. **Install Dependensi Desain (Tailwind/Vite)**
+   ```bash
+   npm install
+   ```
+
+4. **Siapkan File Konfigurasi (.env)**
+   * Copy/duplikat file `.env.example` dan ubah namanya menjadi `.env`.
+   * Buka terminal dan buat kunci rahasia aplikasi:
+     ```bash
+     php artisan key:generate
+     ```
+
+5. **Hubungkan Database MySQL**
+   * Nyalakan module **MySQL** di aplikasi XAMPP Anda.
+   * Buka browser dan pergi ke `http://localhost/phpmyadmin`.
+   * Buat database kosong baru dengan nama `assetops`.
+   * Buka file `.env` di VS Code, lalu pastikan konfigurasinya seperti ini:
+     ```env
+     DB_CONNECTION=mysql
+     DB_HOST=127.0.0.1
+     DB_PORT=3306
+     DB_DATABASE=assetops
+     DB_USERNAME=root
+     DB_PASSWORD=
+     ```
+
+6. **Migrasi Tabel (Membuat Struktur Database)**
+   ```bash
+   php artisan migrate
+   ```
+   *(Opsional: Jika ada data dummy/seeder, Anda bisa menjalankan `php artisan migrate --seed`)*
+
+7. **Jalankan Aplikasi**
+   Anda membutuhkan dua terminal yang menyala bersamaan di VS Code:
+   
+   **Terminal 1 (Menjalankan Web Server/Laravel):**
+   ```bash
+   php artisan serve
+   ```
+   **Terminal 2 (Menjalankan Desain CSS):**
+   ```bash
+   npm run dev
+   ```
+
+8. **Selesai!** 🎉
+   Buka browser Anda dan akses aplikasi di: **`http://127.0.0.1:8000`**
+
+---
+
 ## 📄 Lisensi
 
 Proyek ini dikembangkan secara internal untuk keperluan **PT Pupuk Kaltim - Departemen AdKor**. Seluruh hak cipta dilindungi.
