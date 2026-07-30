@@ -1,22 +1,31 @@
-<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" {{ $attributes }}>
-    <!-- Hexagonal S shape - similar to AdKor SIAP logo -->
-    <!-- Outer hexagon outline formed by S shape -->
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {{ $attributes }}>
+    <!--
+        Logo SIAP - Hexagonal S shape
+        Inspired by the reference image:
+        - Dark navy blue body (#0c3d8a, #0a2d6e)
+        - Orange accent tip at top-right (#F97316)
+        - Light blue inner cube 3D
+        The shape traces an "S" letter inside a hexagon
+    -->
 
-    <!-- Main S-shape body (dark blue) - left outer curve top -->
-    <path d="M 30 20 L 60 4 L 90 20 L 90 52 L 60 68 L 60 56 L 80 45 L 80 26 L 60 15 L 40 26 L 40 44 L 60 56 L 60 68 L 30 52 Z" fill="#1a4fa0" />
+    <!-- Top-left arm of S (light blue inner top) -->
+    <path d="M 50 8 L 22 24 L 22 50 L 50 34 L 78 50 L 78 24 Z" fill="#1a4fa0"/>
 
-    <!-- S-shape body (dark navy) - right outer curve bottom -->
-    <path d="M 90 68 L 60 84 L 30 68 L 30 36 L 60 52 L 60 64 L 40 75 L 60 86 L 80 75 L 80 57 L 60 44 L 60 52 L 90 36 Z" fill="#0a2d6e" />
+    <!-- Connecting bridge (middle of S, dark) -->
+    <path d="M 22 50 L 50 66 L 78 50 L 50 34 Z" fill="#0a2d6e"/>
 
-    <!-- Orange accent top-right -->
-    <path d="M 90 20 L 105 28 L 105 44 L 90 36 Z" fill="#F97316" />
-    <circle cx="105" cy="28" r="6" fill="#F97316" />
+    <!-- Bottom-right arm of S -->
+    <path d="M 50 66 L 78 50 L 78 76 L 50 92 L 22 76 L 22 50 Z" fill="#0c3d8a"/>
 
-    <!-- Center 3D cube -->
-    <!-- Cube top face -->
-    <polygon points="60,50 72,57 60,64 48,57" fill="#5b9bd5" />
-    <!-- Cube left face -->
-    <polygon points="48,57 60,64 60,78 48,71" fill="#2563eb" />
-    <!-- Cube right face -->
-    <polygon points="72,57 60,64 60,78 72,71" fill="#1a4fa0" />
+    <!-- Orange accent: top-right corner tip -->
+    <path d="M 78 24 L 92 32 L 92 50 L 78 50 Z" fill="#F97316"/>
+    <circle cx="92" cy="32" r="7" fill="#F97316"/>
+
+    <!-- 3D Cube in center of S -->
+    <!-- Top face (lightest) -->
+    <polygon points="50,42 61,48.5 50,55 39,48.5" fill="#60a5fa"/>
+    <!-- Left face -->
+    <polygon points="39,48.5 50,55 50,68 39,61.5" fill="#2563eb"/>
+    <!-- Right face -->
+    <polygon points="61,48.5 50,55 50,68 61,61.5" fill="#1a4fa0"/>
 </svg>

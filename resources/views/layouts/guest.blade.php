@@ -21,7 +21,7 @@
             body { font-family: 'Poppins', sans-serif; }
 
             .login-left {
-                background: linear-gradient(145deg, #0a2558 0%, #0d3580 35%, #0a2558 70%, #071a40 100%);
+                background: linear-gradient(145deg, #0B1E36 0%, #0f2848 40%, #0B1E36 75%, #091729 100%);
                 position: relative;
                 overflow: hidden;
             }
@@ -33,7 +33,7 @@
                 right: -15%;
                 width: 500px;
                 height: 500px;
-                background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+                background: radial-gradient(circle, rgba(173,218,240,0.08) 0%, transparent 70%);
                 border-radius: 50%;
             }
 
@@ -44,7 +44,7 @@
                 left: -10%;
                 width: 400px;
                 height: 400px;
-                background: radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%);
+                background: radial-gradient(circle, rgba(249,115,22,0.07) 0%, transparent 70%);
                 border-radius: 50%;
             }
 
@@ -189,26 +189,19 @@
 
                 <!-- Wave decoration bottom -->
                 <svg class="wave-lines" viewBox="0 0 1200 200" preserveAspectRatio="none">
-                    <path d="M0,100 C150,160 350,20 600,100 C850,180 1050,40 1200,100 L1200,200 L0,200 Z" fill="rgba(59,130,246,0.3)"/>
-                    <path d="M0,130 C200,80 400,170 600,130 C800,90 1000,160 1200,130 L1200,200 L0,200 Z" fill="rgba(249,115,22,0.2)"/>
+                    <path d="M0,100 C150,160 350,20 600,100 C850,180 1050,40 1200,100 L1200,200 L0,200 Z" fill="rgba(173,218,240,0.12)"/>
+                    <path d="M0,130 C200,80 400,170 600,130 C800,90 1000,160 1200,130 L1200,200 L0,200 Z" fill="rgba(249,115,22,0.15)"/>
                 </svg>
 
-                <!-- Top: AdKor Logo Area -->
-                <div class="relative z-10 flex items-center gap-3 animate-fade-in">
-                    <div class="flex items-center gap-2 bg-white/10 backdrop-blur rounded-xl px-4 py-2 border border-white/15">
-                        <div class="flex items-center gap-1">
-                            <!-- Pupuk Kaltim ADKOR text logo style -->
-                            <span class="text-white font-bold text-lg tracking-widest" style="font-family:'Poppins',sans-serif; letter-spacing:0.15em;">ADKOR</span>
-                        </div>
-                        <div class="w-px h-5 bg-white/30 mx-1"></div>
-                        <span class="text-white/60 text-xs">PT Pupuk Kalimantan Timur</span>
-                    </div>
+                <!-- Top: AdKor Logo (gambar asli) -->
+                <div class="relative z-10 animate-fade-in">
+                    <img src="{{ asset('images/Logo PKT AdKor.png') }}" alt="AdKor - PT Pupuk Kalimantan Timur" class="h-12 object-contain" style="filter: brightness(0) invert(1);">
                 </div>
 
                 <!-- Center: Main Branding -->
                 <div class="relative z-10 flex flex-col items-center text-center animate-fade-in-delay">
                     <!-- Logo Icon -->
-                    <div class="mb-6 drop-shadow-2xl" style="filter: drop-shadow(0 0 30px rgba(59,130,246,0.4));">
+                    <div class="mb-6 drop-shadow-2xl" style="filter: drop-shadow(0 0 30px rgba(173,218,240,0.3));">
                         <x-application-logo class="w-28 h-28" />
                     </div>
 
