@@ -3,7 +3,7 @@
         <rect x="1.5" y="1.5" width="37" height="37" rx="10" fill="white" stroke="#E2E8F0" stroke-width="2"/>
         <text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle"
               font-family="'Poppins', Arial, sans-serif" font-weight="800" font-size="16">
-            <tspan fill="#0F172A">Λ</tspan><tspan fill="#F97316">O</tspan>
+            <tspan fill="#0F172A">S</tspan><tspan fill="#F97316">P</tspan>
         </text>
     </g>
 </svg>

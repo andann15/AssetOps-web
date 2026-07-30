@@ -8,10 +8,10 @@
             <x-application-logo class="w-10 h-10 flex-shrink-0" /> 
             <div class="flex flex-col justify-center">
                 <span class="text-3xl font-extrabold italic [font-family:'Poppins',sans-serif] whitespace-nowrap leading-none">
-                    <span class="text-white">Λsset</span><span class="text-orange-500">Ops</span>
+                    <span class="text-white">SI</span><span class="text-orange-500">AP</span>
                 </span>
                 <span class="text-[9px] uppercase tracking-[0.08em] font-semibold text-gray-400 mt-1 leading-[1.2]">
-                    Integrated Asset &<br>Maintenance Management
+                    Sistem Informasi<br>Aset & Pelayanan
                 </span>
             </div>
         </div>
