@@ -1,7 +1,5 @@
 <div align="center">
-
-# ΛssetOps
-
+# SIAP
 **Integrated Asset & Maintenance Management System**
 
 > Sistem manajemen aset dan tiket keluhan berbasis web untuk lingkungan korporat — dikembangkan untuk **PT Pupuk Kaltim - Departemen Administrasi Korporat (AdKor)**.
@@ -20,7 +18,7 @@
 
 ## 📋 Deskripsi Proyek
 
-**AssetOps** adalah aplikasi web manajemen aset dan pemeliharaan internal yang dirancang untuk mempermudah proses pelaporan, pengelolaan, dan pemantauan kerusakan aset kantor. Sistem ini memungkinkan:
+**SIAP** adalah aplikasi web manajemen aset dan pemeliharaan internal yang dirancang untuk mempermudah proses pelaporan, pengelolaan, dan pemantauan kerusakan aset kantor. Sistem ini memungkinkan:
 
 - **Karyawan** memilih aset yang sedang mereka gunakan dan melaporkan kerusakan secara langsung.
 - **Admin** mengelola data aset, pengguna, dan menyetujui/menolak tiket keluhan.
