@@ -107,7 +107,7 @@
             .btn-login {
                 width: 100%;
                 padding: 13px;
-                background: linear-gradient(135deg, #1a4fa0 0%, #0d3580 100%);
+                background: #0B1E36;
                 color: white;
                 border: none;
                 border-radius: 10px;
@@ -120,14 +120,14 @@
                 justify-content: center;
                 gap: 10px;
                 transition: all 0.3s ease;
-                box-shadow: 0 4px 15px rgba(13, 53, 128, 0.4);
+                box-shadow: 0 4px 15px rgba(11, 30, 54, 0.35);
                 letter-spacing: 0.3px;
             }
 
             .btn-login:hover {
-                background: linear-gradient(135deg, #1e5cbf 0%, #1a4fa0 100%);
+                background: #F97316;
                 transform: translateY(-1px);
-                box-shadow: 0 6px 20px rgba(13, 53, 128, 0.5);
+                box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
             }
 
             .btn-login:active {
@@ -193,10 +193,8 @@
                     <path d="M0,130 C200,80 400,170 600,130 C800,90 1000,160 1200,130 L1200,200 L0,200 Z" fill="rgba(249,115,22,0.15)"/>
                 </svg>
 
-                <!-- Top: AdKor Logo (gambar asli) -->
-                <div class="relative z-10 animate-fade-in">
-                    <img src="{{ asset('images/Logo PKT AdKor.png') }}" alt="AdKor - PT Pupuk Kalimantan Timur" class="h-12 object-contain" style="filter: brightness(0) invert(1);">
-                </div>
+                <!-- Top spacer (no logo) -->
+                <div class="relative z-10 h-12"></div>
 
                 <!-- Center: Main Branding -->
                 <div class="relative z-10 flex flex-col items-center text-center animate-fade-in-delay">
@@ -302,7 +300,7 @@
                         <!-- Heading -->
                         <div class="text-center mb-7">
                             <h1 class="text-gray-800 font-bold text-2xl" style="font-family:'Poppins',sans-serif;">
-                                Selamat Datang di <span class="text-[#F97316]">SIAP</span>
+                                Selamat Datang di <span class="text-[#0B1E36]">S</span><span class="text-[#F97316]">i</span><span class="text-[#0B1E36]">AP</span>
                             </h1>
                             <p class="text-gray-400 text-sm mt-1">Silakan masuk untuk melanjutkan</p>
                         </div>
