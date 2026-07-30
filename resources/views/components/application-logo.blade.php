@@ -1,14 +1,22 @@
-<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {{ $attributes }}>
-    <!-- Hexagon Background (transparent/none) -->
-    <!-- Top left & bottom section - Blue #0A3A82 -->
-    <path d="M 50 10 L 20 27.5 L 20 62.5 L 35 71 L 35 45 L 65 27.5 Z" fill="#0c4a9e" />
-    <path d="M 50 90 L 80 72.5 L 80 37.5 L 65 29 L 65 55 L 35 72.5 Z" fill="#042250" />
-    
-    <!-- Top Right - Orange -->
-    <path d="M 65 29 L 80 37.5 L 80 50 L 65 41.5 Z" fill="#F97316" />
-    
-    <!-- Center Cube - Light Blue -->
-    <path d="M 50 45 L 60 50.5 L 50 56 L 40 50.5 Z" fill="#3b82f6" />
-    <path d="M 40 50.5 L 50 56 L 50 67.5 L 40 62 Z" fill="#2563eb" />
-    <path d="M 60 50.5 L 50 56 L 50 67.5 L 60 62 Z" fill="#1d4ed8" />
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" {{ $attributes }}>
+    <!-- Hexagonal S shape - similar to AdKor SIAP logo -->
+    <!-- Outer hexagon outline formed by S shape -->
+
+    <!-- Main S-shape body (dark blue) - left outer curve top -->
+    <path d="M 30 20 L 60 4 L 90 20 L 90 52 L 60 68 L 60 56 L 80 45 L 80 26 L 60 15 L 40 26 L 40 44 L 60 56 L 60 68 L 30 52 Z" fill="#1a4fa0" />
+
+    <!-- S-shape body (dark navy) - right outer curve bottom -->
+    <path d="M 90 68 L 60 84 L 30 68 L 30 36 L 60 52 L 60 64 L 40 75 L 60 86 L 80 75 L 80 57 L 60 44 L 60 52 L 90 36 Z" fill="#0a2d6e" />
+
+    <!-- Orange accent top-right -->
+    <path d="M 90 20 L 105 28 L 105 44 L 90 36 Z" fill="#F97316" />
+    <circle cx="105" cy="28" r="6" fill="#F97316" />
+
+    <!-- Center 3D cube -->
+    <!-- Cube top face -->
+    <polygon points="60,50 72,57 60,64 48,57" fill="#5b9bd5" />
+    <!-- Cube left face -->
+    <polygon points="48,57 60,64 60,78 48,71" fill="#2563eb" />
+    <!-- Cube right face -->
+    <polygon points="72,57 60,64 60,78 72,71" fill="#1a4fa0" />
 </svg>
