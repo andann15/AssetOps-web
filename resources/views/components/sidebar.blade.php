@@ -7,8 +7,8 @@
         <div class="flex items-center gap-3 overflow-hidden" x-show="!sidebarCollapsed">
             <x-application-logo class="w-10 h-10 flex-shrink-0" /> 
             <div class="flex flex-col justify-center">
-                <span class="text-3xl font-extrabold italic [font-family:'Poppins',sans-serif] whitespace-nowrap leading-none">
-                    <span class="text-white">SI</span><span class="text-orange-500">AP</span>
+                <span class="text-3xl font-extrabold [font-family:'Poppins',sans-serif] whitespace-nowrap leading-none tracking-tight">
+                    <span class="text-white">S</span><span class="text-orange-500">i</span><span class="text-white">AP</span>
                 </span>
                 <span class="text-[9px] uppercase tracking-[0.08em] font-semibold text-gray-400 mt-1 leading-[1.2]">
                     Sistem Informasi<br>Aset & Pelayanan

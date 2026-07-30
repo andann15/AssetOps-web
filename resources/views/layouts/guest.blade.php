@@ -26,12 +26,12 @@
             <div class="z-10 flex flex-col items-center">
                 <a href="/" class="flex items-center justify-center gap-3 group">
                     <x-application-logo class="h-16 w-16 shadow-[0_0_15px_rgba(255,255,255,0.1)] rounded-[14px] transition-transform duration-300 group-hover:scale-105" />
-                    <span class="text-4xl font-extrabold italic [font-family:'Poppins',sans-serif] tracking-tight">
-                        <span class="text-white drop-shadow-md">Λsset</span><span class="text-orange-500 drop-shadow-md">Ops</span>
+                    <span class="text-5xl font-extrabold [font-family:'Poppins',sans-serif] tracking-tight">
+                        <span class="text-white drop-shadow-md">S</span><span class="text-orange-500 drop-shadow-md">i</span><span class="text-white drop-shadow-md">AP</span>
                     </span>
                 </a>
                 <span class="text-xs uppercase tracking-[0.08em] font-semibold text-gray-400 mt-3 leading-[1.4] text-center">
-                    Integrated Asset &<br>Maintenance Management
+                    Sistem Informasi<br>Aset & Pelayanan
                 </span>
             </div>
 
