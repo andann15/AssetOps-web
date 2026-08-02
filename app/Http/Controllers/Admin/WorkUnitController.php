@@ -28,12 +28,34 @@ class WorkUnitController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'department_id' => ['required', 'exists:departments,id'],
-            'name'          => ['required', 'string', 'max:255'],
+            'new_compartment_name' => ['nullable', 'string', 'max:255'],
+            'compartment_id'       => ['nullable', 'exists:compartments,id'],
+            'new_department_name'  => ['nullable', 'string', 'max:255'],
+            'department_id'        => ['nullable', 'exists:departments,id'],
+            'name'                 => ['required', 'string', 'max:255'],
         ]);
 
+        $compartmentId = $request->compartment_id;
+        if ($request->filled('new_compartment_name')) {
+            $comp = Compartment::create(['name' => $request->new_compartment_name, 'is_active' => true]);
+            $compartmentId = $comp->id;
+        }
+
+        $departmentId = $request->department_id;
+        if ($request->filled('new_department_name')) {
+            if (!$compartmentId) {
+                return back()->withErrors(['new_department_name' => 'Pilih atau buat Kompartemen terlebih dahulu.'])->withInput();
+            }
+            $dept = Department::create(['compartment_id' => $compartmentId, 'name' => $request->new_department_name, 'is_active' => true]);
+            $departmentId = $dept->id;
+        }
+
+        if (!$departmentId) {
+            return back()->withErrors(['department_id' => 'Pilih atau buat Departemen terlebih dahulu.'])->withInput();
+        }
+
         WorkUnit::create([
-            'department_id' => $validated['department_id'],
+            'department_id' => $departmentId,
             'name'          => $validated['name'],
             'is_active'     => true,
         ]);
@@ -52,11 +74,36 @@ class WorkUnitController extends Controller
     public function update(Request $request, WorkUnit $workUnit)
     {
         $validated = $request->validate([
-            'department_id' => ['required', 'exists:departments,id'],
-            'name'          => ['required', 'string', 'max:255'],
+            'new_compartment_name' => ['nullable', 'string', 'max:255'],
+            'compartment_id'       => ['nullable', 'exists:compartments,id'],
+            'new_department_name'  => ['nullable', 'string', 'max:255'],
+            'department_id'        => ['nullable', 'exists:departments,id'],
+            'name'                 => ['required', 'string', 'max:255'],
         ]);
 
-        $workUnit->update($validated);
+        $compartmentId = $request->compartment_id;
+        if ($request->filled('new_compartment_name')) {
+            $comp = Compartment::create(['name' => $request->new_compartment_name, 'is_active' => true]);
+            $compartmentId = $comp->id;
+        }
+
+        $departmentId = $request->department_id;
+        if ($request->filled('new_department_name')) {
+            if (!$compartmentId) {
+                return back()->withErrors(['new_department_name' => 'Pilih atau buat Kompartemen terlebih dahulu.'])->withInput();
+            }
+            $dept = Department::create(['compartment_id' => $compartmentId, 'name' => $request->new_department_name, 'is_active' => true]);
+            $departmentId = $dept->id;
+        }
+
+        if (!$departmentId) {
+            return back()->withErrors(['department_id' => 'Pilih atau buat Departemen terlebih dahulu.'])->withInput();
+        }
+
+        $workUnit->update([
+            'department_id' => $departmentId,
+            'name'          => $validated['name'],
+        ]);
 
         return redirect()->route('admin.work-units.index')
             ->with('success', 'Unit Kerja berhasil diperbarui.');
