@@ -52,14 +52,16 @@
 
                             <!-- Division -->
                             <div>
-                                <label for="division_id" class="block text-sm font-medium text-gray-700 mb-1">Divisi (Opsional)</label>
-                                <select id="division_id" name="division_id" class="block w-full border-gray-300 focus:border-brand focus:ring-brand rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                                    <option value="">-- Tanpa Divisi --</option>
-                                    @foreach($divisions as $division)
-                                        <option value="{{ $division->id }}" {{ old('division_id') == $division->id ? 'selected' : '' }}>{{ $division->name }}</option>
+                                <label for="work_unit_id" class="block text-sm font-medium text-gray-700 mb-1">Unit Kerja (Opsional)</label>
+                                <select id="work_unit_id" name="work_unit_id" class="block w-full border-gray-300 focus:border-brand focus:ring-brand rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                                    <option value="">-- Tanpa Unit Kerja --</option>
+                                    @foreach($workUnits as $workUnit)
+                                        <option value="{{ $workUnit->id }}" {{ old('work_unit_id') == $workUnit->id ? 'selected' : '' }}>
+                                            {{ $workUnit->name }} ({{ $workUnit->department->name ?? '-' }} / {{ $workUnit->department->compartment->name ?? '-' }})
+                                        </option>
                                     @endforeach
                                 </select>
-                                <x-input-error :messages="$errors->get('division_id')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('work_unit_id')" class="mt-2" />
                             </div>
 
                             <!-- Password -->

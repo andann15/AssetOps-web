@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Division;
+use App\Models\WorkUnit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
@@ -13,34 +13,34 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with('division', 'roles')->latest()->paginate(15);
+        $users = User::with('workUnit.department.compartment', 'roles')->latest()->paginate(15);
         return view('admin.users.index', compact('users'));
     }
 
     public function create()
     {
-        $divisions = Division::where('is_active', true)->get();
-        return view('admin.users.create', compact('divisions'));
+        $workUnits = WorkUnit::with('department.compartment')->where('is_active', true)->get();
+        return view('admin.users.create', compact('workUnits'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nik' => ['required', 'string', 'max:255', 'unique:users'],
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string', 'in:admin,operator,user'],
-            'division_id' => ['nullable', 'exists:divisions,id'],
+            'nik'          => ['required', 'string', 'max:255', 'unique:users'],
+            'name'         => ['required', 'string', 'max:255'],
+            'email'        => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password'     => ['required', 'confirmed', Rules\Password::defaults()],
+            'role'         => ['required', 'string', 'in:admin,operator,user'],
+            'work_unit_id' => ['nullable', 'exists:work_units,id'],
         ]);
 
         $user = User::create([
-            'nik' => $validated['nik'],
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => $validated['role'], // We still save it on table if it exists as column
-            'division_id' => $validated['division_id'],
+            'nik'          => $validated['nik'],
+            'name'         => $validated['name'],
+            'email'        => $validated['email'],
+            'password'     => Hash::make($validated['password']),
+            'role'         => $validated['role'],
+            'work_unit_id' => $validated['work_unit_id'],
         ]);
 
         $user->assignRole($validated['role']);
@@ -50,27 +50,27 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $divisions = Division::where('is_active', true)->get();
-        return view('admin.users.edit', compact('user', 'divisions'));
+        $workUnits = WorkUnit::with('department.compartment')->where('is_active', true)->get();
+        return view('admin.users.edit', compact('user', 'workUnits'));
     }
 
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'nik' => ['required', 'string', 'max:255', 'unique:users,nik,' . $user->id],
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string', 'in:admin,operator,user'],
-            'division_id' => ['nullable', 'exists:divisions,id'],
+            'nik'          => ['required', 'string', 'max:255', 'unique:users,nik,' . $user->id],
+            'name'         => ['required', 'string', 'max:255'],
+            'email'        => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'password'     => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'role'         => ['required', 'string', 'in:admin,operator,user'],
+            'work_unit_id' => ['nullable', 'exists:work_units,id'],
         ]);
 
         $data = [
-            'nik' => $validated['nik'],
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'role' => $validated['role'],
-            'division_id' => $validated['division_id'],
+            'nik'          => $validated['nik'],
+            'name'         => $validated['name'],
+            'email'        => $validated['email'],
+            'role'         => $validated['role'],
+            'work_unit_id' => $validated['work_unit_id'],
         ];
 
         if ($request->filled('password')) {

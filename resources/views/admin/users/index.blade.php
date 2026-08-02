@@ -39,7 +39,7 @@
                             <tr>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Pengguna</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Peran (Role)</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Divisi</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Unit Kerja</th>
                                 <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
                             </tr>
                         </thead>
@@ -69,7 +69,12 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="text-sm text-gray-700">{{ $user->division->name ?? '-' }}</span>
+                                        <span class="text-sm text-gray-700">{{ $user->workUnit->name ?? '-' }}</span>
+                                        @if($user->workUnit)
+                                            <div class="text-xs text-gray-500 mt-0.5">
+                                                {{ $user->workUnit->department->name ?? '-' }} / {{ $user->workUnit->department->compartment->name ?? '-' }}
+                                            </div>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 text-right">
                                         <div class="flex justify-end gap-3">

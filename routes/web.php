@@ -3,7 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\DivisionController;
+use App\Http\Controllers\Admin\WorkUnitController;
 use App\Http\Controllers\Admin\AssetCategoryController;
 use App\Http\Controllers\Admin\TicketPriorityController;
 use App\Http\Controllers\Admin\RejectionReasonController;
@@ -22,16 +22,19 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
 
 Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
-    ->prefix('admin/divisions')
-    ->name('admin.divisions.')
+    ->prefix('admin/work-units')
+    ->name('admin.work-units.')
     ->group(function () {
-        Route::get('/', [DivisionController::class, 'index'])->name('index');
-        Route::get('/create', [DivisionController::class, 'create'])->name('create');
-        Route::post('/', [DivisionController::class, 'store'])->name('store');
-        Route::get('/{division}/edit', [DivisionController::class, 'edit'])->name('edit');
-        Route::put('/{division}', [DivisionController::class, 'update'])->name('update');
-        Route::patch('/{division}/toggle', [DivisionController::class, 'toggleActive'])->name('toggle');
+        Route::get('/', [WorkUnitController::class, 'index'])->name('index');
+        Route::get('/create', [WorkUnitController::class, 'create'])->name('create');
+        Route::post('/', [WorkUnitController::class, 'store'])->name('store');
+        Route::get('/{workUnit}/edit', [WorkUnitController::class, 'edit'])->name('edit');
+        Route::put('/{workUnit}', [WorkUnitController::class, 'update'])->name('update');
+        Route::patch('/{workUnit}/toggle', [WorkUnitController::class, 'toggleActive'])->name('toggle');
     });
+
+// Redirect lama /admin/divisions ke /admin/work-units agar tidak 404
+Route::redirect('/admin/divisions', '/admin/work-units')->middleware(['auth']);
 Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
     ->prefix('admin/brands')
     ->name('admin.brands.')
