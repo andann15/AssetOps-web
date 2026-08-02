@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Division;
-use App\Models\DivisionHistory;
+use App\Models\WorkUnit;
+use App\Models\WorkUnitHistory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -12,9 +12,9 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $itDivision = Division::where('name', 'IT & Sistem Informasi')->first();
-        $maintenanceDivision = Division::where('name', 'Pemeliharaan (Maintenance)')->first();
-        $produksiDivision = Division::where('name', 'Produksi')->first();
+        $itUnit = WorkUnit::where('name', 'Unit Server & Cloud')->first();
+        $maintenanceUnit = WorkUnit::where('name', 'Unit Maintenance Dasar')->first();
+        $produksiUnit = WorkUnit::where('name', 'Unit Shift A')->first();
 
         $admin = User::firstOrCreate(
             ['email' => 'admin@pkt.id'],
@@ -23,12 +23,12 @@ class UserSeeder extends Seeder
                 'name' => 'Admin AdKor',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
-                'division_id' => $itDivision->id,
+                'work_unit_id' => $itUnit->id ?? null,
                 'login_pertama' => false,
             ]
         );
         $admin->assignRole('admin');
-        $this->recordDivisionHistory($admin, $itDivision, $admin);
+        if ($itUnit) $this->recordWorkUnitHistory($admin, $itUnit, $admin);
 
         $operator = User::firstOrCreate(
             ['email' => 'operator@pkt.id'],
@@ -37,12 +37,12 @@ class UserSeeder extends Seeder
                 'name' => 'Operator Maintenance',
                 'password' => Hash::make('password'),
                 'role' => 'operator',
-                'division_id' => $maintenanceDivision->id,
+                'work_unit_id' => $maintenanceUnit->id ?? null,
                 'login_pertama' => false,
             ]
         );
         $operator->assignRole('operator');
-        $this->recordDivisionHistory($operator, $maintenanceDivision, $admin);
+        if ($maintenanceUnit) $this->recordWorkUnitHistory($operator, $maintenanceUnit, $admin);
 
         $employee = User::firstOrCreate(
             ['email' => 'karyawan@pkt.id'],
@@ -51,19 +51,21 @@ class UserSeeder extends Seeder
                 'name' => 'Karyawan Produksi',
                 'password' => Hash::make('password'),
                 'role' => 'user',
-                'division_id' => $produksiDivision->id,
+                'work_unit_id' => $produksiUnit->id ?? null,
                 'login_pertama' => false,
             ]
         );
         $employee->assignRole('user');
-        $this->recordDivisionHistory($employee, $produksiDivision, $admin);
+        if ($produksiUnit) $this->recordWorkUnitHistory($employee, $produksiUnit, $admin);
     }
 
-    private function recordDivisionHistory(User $user, Division $division, User $actor): void
+    private function recordWorkUnitHistory(User $user, WorkUnit $unit, User $actor): void
     {
-        DivisionHistory::firstOrCreate(
-            ['user_id' => $user->id, 'division_id' => $division->id, 'ended_at' => null],
-            ['changed_by' => $actor->id, 'started_at' => now()]
-        );
+        WorkUnitHistory::create([
+            'user_id' => $user->id, 
+            'to_work_unit_id' => $unit->id, 
+            'changed_by' => $actor->id, 
+            'reason' => 'Initial assign'
+        ]);
     }
 }

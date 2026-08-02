@@ -19,7 +19,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'division_id',
+        'work_unit_id',
     ];
 
     protected $hidden = [
@@ -35,8 +35,8 @@ class User extends Authenticatable
         ];
     }
 
-    public function division()
+    public function workUnit()
     {
-        return $this->belongsTo(Division::class);
+        return $this->belongsTo(WorkUnit::class);
     }
 }

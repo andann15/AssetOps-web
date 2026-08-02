@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\AssetCategory;
 use App\Models\Brand;
-use App\Models\Division;
 use App\Models\Location;
 use App\Models\RejectionReason;
 use App\Models\TicketPriority;
@@ -14,15 +13,37 @@ class MasterDataSeeder extends Seeder
 {
     public function run(): void
     {
-        $divisions = [
-            'IT & Sistem Informasi',
-            'Produksi',
-            'Pemeliharaan (Maintenance)',
-            'Keuangan',
-            'Sumber Daya Manusia',
+        $kompartemens = [
+            'Kompartemen Teknologi Informasi' => [
+                'Departemen Infrastruktur TI' => ['Unit Jaringan', 'Unit Server & Cloud'],
+                'Departemen Pengembangan Aplikasi' => ['Unit ERP', 'Unit Aplikasi Bisnis'],
+            ],
+            'Kompartemen Sumber Daya Manusia' => [
+                'Departemen Pendidikan & Pelatihan' => ['Unit Operasional Diklat', 'Unit Perencanaan Diklat'],
+                'Departemen Personalia' => ['Unit Administrasi Karyawan', 'Unit Payroll'],
+            ],
+            'Kompartemen Operasi & Produksi' => [
+                'Departemen Operasi Pabrik 1' => ['Unit Shift A', 'Unit Shift B'],
+                'Departemen Operasi Pabrik 2' => ['Unit Kontrol', 'Unit Maintenance Dasar'],
+            ],
         ];
-        foreach ($divisions as $name) {
-            Division::firstOrCreate(['name' => $name], ['is_active' => true]);
+
+        foreach ($kompartemens as $kompartemenName => $departemens) {
+            $comp = \App\Models\Compartment::firstOrCreate(['name' => $kompartemenName], ['is_active' => true]);
+            
+            foreach ($departemens as $deptName => $workUnits) {
+                $dept = \App\Models\Department::firstOrCreate([
+                    'compartment_id' => $comp->id,
+                    'name' => $deptName
+                ], ['is_active' => true]);
+
+                foreach ($workUnits as $wuName) {
+                    \App\Models\WorkUnit::firstOrCreate([
+                        'department_id' => $dept->id,
+                        'name' => $wuName
+                    ], ['is_active' => true]);
+                }
+            }
         }
 
         $categories = [
