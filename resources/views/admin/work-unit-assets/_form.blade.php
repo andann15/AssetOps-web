@@ -4,7 +4,7 @@
 
 <div class="grid grid-cols-2 gap-4">
     <div class="mb-4 col-span-2">
-        <label for="code" class="block text-sm font-medium text-gray-700">Kode Aset</label>
+        <label for="code" class="block text-sm font-medium text-gray-700">Kode Aset / Kode Rombongan</label>
         <input type="text" name="code" id="code" value="{{ old('code', $asset->code ?? '') }}"
                class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         @error('code')
@@ -13,7 +13,7 @@
     </div>
 
     <div class="mb-4 col-span-2">
-        <label for="name" class="block text-sm font-medium text-gray-700">Nama Aset</label>
+        <label for="name" class="block text-sm font-medium text-gray-700">Nama Aset / Batch</label>
         <input type="text" name="name" id="name" value="{{ old('name', $asset->name ?? '') }}"
                class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         @error('name')
@@ -90,7 +90,7 @@
     </div>
 
     <div class="mb-4">
-        <label for="location_id" class="block text-sm font-medium text-gray-700">Lokasi</label>
+        <label for="location_id" class="block text-sm font-medium text-gray-700">Lokasi Penempatan</label>
         <select name="location_id" id="location_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <option value="">-- Pilih Lokasi --</option>
             @foreach ($locations as $location)
@@ -119,16 +119,26 @@
     </div>
 
     <div class="mb-4 col-span-2">
-        <label for="current_user_id" class="block text-sm font-medium text-gray-700">Pengguna Saat Ini (opsional)</label>
-        <select name="current_user_id" id="current_user_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-            <option value="">-- Tidak Ada --</option>
-            @foreach ($users as $user)
-                <option value="{{ $user->id }}" @selected(old('current_user_id', $asset->current_user_id ?? '') == $user->id)>
-                    {{ $user->name }}
+        <label for="work_unit_id" class="block text-sm font-medium text-gray-700">Penugasan Ke Unit Kerja</label>
+        <select name="work_unit_id" id="work_unit_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <option value="">-- Pilih Unit Kerja --</option>
+            @foreach ($workUnits as $wu)
+                <option value="{{ $wu->id }}" @selected(old('work_unit_id', $asset->work_unit_id ?? '') == $wu->id)>
+                    {{ $wu->name }} ({{ $wu->department->name ?? '-' }} / {{ $wu->department->compartment->name ?? '-' }})
                 </option>
             @endforeach
         </select>
-        @error('current_user_id')
+        @error('work_unit_id')
+            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <div class="mb-4 col-span-2">
+        <label for="notes" class="block text-sm font-medium text-gray-700">Rincian / Keterangan Khusus</label>
+        <textarea name="notes" id="notes" rows="4" placeholder="Misal:&#10;1. Laptop = 7&#10;2. Kursi = 8&#10;3. Lemari = 14&#10;Sudah diserahkan ke Yayasan PKT"
+                  class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">{{ old('notes', $asset->notes ?? '') }}</textarea>
+        <p class="text-xs text-gray-500 mt-1">Gunakan titik koma (;) atau enter untuk memisahkan daftar barang agar rapi.</p>
+        @error('notes')
             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
         @enderror
     </div>

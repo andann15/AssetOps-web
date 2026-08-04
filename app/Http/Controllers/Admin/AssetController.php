@@ -43,8 +43,8 @@ class AssetController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $this->validateAsset($request);
-        $validated = $this->handleAssignmentType($request, $validated);
-
+        $validated['work_unit_id'] = null; // Pastikan aset individu tidak punya work_unit
+        
         Asset::create($validated);
 
         return redirect()->route('admin.assets.index')->with('success', 'Aset berhasil ditambahkan.');
@@ -61,7 +61,7 @@ class AssetController extends Controller
     public function update(Request $request, Asset $asset): RedirectResponse
     {
         $validated = $this->validateAsset($request, $asset);
-        $validated = $this->handleAssignmentType($request, $validated);
+        $validated['work_unit_id'] = null;
 
         $asset->update($validated);
 
@@ -83,29 +83,15 @@ class AssetController extends Controller
             'code' => ['required', 'string', 'max:255', $codeRule],
             'name' => ['required', 'string', 'max:255'],
             'asset_category_id' => ['required', 'exists:asset_categories,id'],
-            'brand_id' => ['required', 'exists:brands,id'],
+            'brand_id' => ['nullable', 'exists:brands,id'],
             'model' => ['nullable', 'string', 'max:255'],
             'serial_number' => ['nullable', 'string', 'max:255'],
             'purchase_date' => ['nullable', 'date'],
             'warranty_end' => ['nullable', 'date', 'after_or_equal:purchase_date'],
             'location_id' => ['required', 'exists:locations,id'],
             'status' => ['required', 'in:' . implode(',', array_keys(self::STATUSES))],
-            'assignment_type' => ['required', 'in:user,work_unit'],
             'current_user_id' => ['nullable', 'exists:users,id'],
-            'work_unit_id' => ['nullable', 'exists:work_units,id'],
-            'notes' => ['nullable', 'string'],
         ]);
-    }
-
-    private function handleAssignmentType(Request $request, array $validated): array
-    {
-        if ($request->assignment_type === 'user') {
-            $validated['work_unit_id'] = null;
-        } else {
-            $validated['current_user_id'] = null;
-        }
-        unset($validated['assignment_type']);
-        return $validated;
     }
 
     private function formOptions(): array

@@ -41,7 +41,13 @@ Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionM
     ->name('admin.work-unit-assets.')
     ->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'store'])->name('store');
         Route::get('/export', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'exportCsv'])->name('export');
+        Route::get('/{workUnitAsset}/edit', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'edit'])->name('edit');
+        Route::put('/{workUnitAsset}', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'update'])->name('update');
+        Route::delete('/{workUnitAsset}', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'destroy'])->name('destroy');
+        Route::get('/{workUnitAsset}/export-single', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'exportSingle'])->name('export-single');
     });
 Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
     ->prefix('admin/brands')
