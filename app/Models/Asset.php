@@ -27,6 +27,8 @@ class Asset extends Model
         'location_id',
         'status',
         'current_user_id',
+        'work_unit_id',
+        'notes',
     ];
 
     protected $casts = [
@@ -52,6 +54,11 @@ class Asset extends Model
     public function currentUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'current_user_id');
+    }
+
+    public function workUnit(): BelongsTo
+    {
+        return $this->belongsTo(WorkUnit::class, 'work_unit_id');
     }
 
     public function tickets(): HasMany

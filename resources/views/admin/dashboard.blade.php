@@ -80,7 +80,7 @@
                 <div class="flex flex-wrap gap-3 text-sm">
                     <a href="{{ route('tickets.index') }}" class="px-4 py-2 bg-brand text-sidebar rounded-md font-medium text-sm hover:bg-brand/90 transition flex items-center gap-2">Kelola Tiket</a>
                     <a href="{{ route('admin.assets.index') }}" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-md font-medium text-sm hover:border-brand hover:text-brand transition flex items-center gap-2">Kelola Aset</a>
-                    <a href="{{ route('admin.divisions.index') }}" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-md font-medium text-sm hover:border-brand hover:text-brand transition flex items-center gap-2">Kelola Divisi</a>
+                    <a href="{{ route('admin.work-units.index') }}" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-md font-medium text-sm hover:border-brand hover:text-brand transition flex items-center gap-2">Kelola Unit Kerja</a>
                     <a href="{{ route('admin.asset-categories.index') }}" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-md font-medium text-sm hover:border-brand hover:text-brand transition flex items-center gap-2">Kelola Kategori Aset</a>
                     <a href="{{ route('admin.ticket-priorities.index') }}" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-md font-medium text-sm hover:border-brand hover:text-brand transition flex items-center gap-2">Kelola Prioritas Tiket</a>
                     <a href="{{ route('admin.rejection-reasons.index') }}" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-md font-medium text-sm hover:border-brand hover:text-brand transition flex items-center gap-2">Kelola Alasan Penolakan</a>

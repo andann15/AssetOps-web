@@ -8,6 +8,7 @@ use App\Models\AssetCategory;
 use App\Models\Brand;
 use App\Models\Location;
 use App\Models\User;
+use App\Models\WorkUnit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -42,6 +43,7 @@ class AssetController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $this->validateAsset($request);
+        $validated = $this->handleAssignmentType($request, $validated);
 
         Asset::create($validated);
 
@@ -59,6 +61,7 @@ class AssetController extends Controller
     public function update(Request $request, Asset $asset): RedirectResponse
     {
         $validated = $this->validateAsset($request, $asset);
+        $validated = $this->handleAssignmentType($request, $validated);
 
         $asset->update($validated);
 
@@ -87,8 +90,22 @@ class AssetController extends Controller
             'warranty_end' => ['nullable', 'date', 'after_or_equal:purchase_date'],
             'location_id' => ['required', 'exists:locations,id'],
             'status' => ['required', 'in:' . implode(',', array_keys(self::STATUSES))],
+            'assignment_type' => ['required', 'in:user,work_unit'],
             'current_user_id' => ['nullable', 'exists:users,id'],
+            'work_unit_id' => ['nullable', 'exists:work_units,id'],
+            'notes' => ['nullable', 'string'],
         ]);
+    }
+
+    private function handleAssignmentType(Request $request, array $validated): array
+    {
+        if ($request->assignment_type === 'user') {
+            $validated['work_unit_id'] = null;
+        } else {
+            $validated['current_user_id'] = null;
+        }
+        unset($validated['assignment_type']);
+        return $validated;
     }
 
     private function formOptions(): array
@@ -98,6 +115,7 @@ class AssetController extends Controller
             'brands' => Brand::where('is_active', true)->orderBy('name')->get(),
             'locations' => Location::where('is_active', true)->orderBy('name')->get(),
             'users' => User::orderBy('name')->get(),
+            'workUnits' => WorkUnit::with('department.compartment')->where('is_active', true)->get(),
             'statuses' => self::STATUSES,
         ];
     }

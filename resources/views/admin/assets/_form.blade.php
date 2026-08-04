@@ -2,7 +2,7 @@
     $asset = $asset ?? null;
 @endphp
 
-<div class="grid grid-cols-2 gap-4">
+<div class="grid grid-cols-2 gap-4" x-data="{ assignmentType: '{{ old('assignment_type', isset($asset) && $asset->work_unit_id ? 'work_unit' : 'user') }}' }">
     <div class="mb-4 col-span-2">
         <label for="code" class="block text-sm font-medium text-gray-700">Kode Aset</label>
         <input type="text" name="code" id="code" value="{{ old('code', $asset->code ?? '') }}"
@@ -119,16 +119,54 @@
     </div>
 
     <div class="mb-4 col-span-2">
-        <label for="current_user_id" class="block text-sm font-medium text-gray-700">Pengguna Saat Ini (opsional)</label>
-        <select name="current_user_id" id="current_user_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-            <option value="">-- Tidak Ada --</option>
-            @foreach ($users as $user)
-                <option value="{{ $user->id }}" @selected(old('current_user_id', $asset->current_user_id ?? '') == $user->id)>
-                    {{ $user->name }}
-                </option>
-            @endforeach
-        </select>
-        @error('current_user_id')
+        <label class="block text-sm font-medium text-gray-700 mb-2">Penugasan Ke (Assignment)</label>
+        <div class="flex items-center gap-6 mb-3">
+            <label class="inline-flex items-center">
+                <input type="radio" name="assignment_type" value="user" x-model="assignmentType" class="text-brand focus:ring-brand">
+                <span class="ml-2 text-sm text-gray-700">Individu (Karyawan)</span>
+            </label>
+            <label class="inline-flex items-center">
+                <input type="radio" name="assignment_type" value="work_unit" x-model="assignmentType" class="text-brand focus:ring-brand">
+                <span class="ml-2 text-sm text-gray-700">Unit Kerja / Rombongan</span>
+            </label>
+        </div>
+
+        <!-- Dropdown User -->
+        <div x-show="assignmentType === 'user'" style="display: none;">
+            <select name="current_user_id" id="current_user_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                <option value="">-- Tidak Ada / Kosong --</option>
+                @foreach ($users as $user)
+                    <option value="{{ $user->id }}" @selected(old('current_user_id', $asset->current_user_id ?? '') == $user->id)>
+                        {{ $user->name }}
+                    </option>
+                @endforeach
+            </select>
+            @error('current_user_id')
+                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <!-- Dropdown Work Unit -->
+        <div x-show="assignmentType === 'work_unit'" style="display: none;">
+            <select name="work_unit_id" id="work_unit_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                <option value="">-- Pilih Unit Kerja --</option>
+                @foreach ($workUnits as $wu)
+                    <option value="{{ $wu->id }}" @selected(old('work_unit_id', $asset->work_unit_id ?? '') == $wu->id)>
+                        {{ $wu->name }} ({{ $wu->department->name ?? '-' }} / {{ $wu->department->compartment->name ?? '-' }})
+                    </option>
+                @endforeach
+            </select>
+            @error('work_unit_id')
+                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+    </div>
+
+    <div class="mb-4 col-span-2">
+        <label for="notes" class="block text-sm font-medium text-gray-700">Keterangan Khusus (opsional)</label>
+        <textarea name="notes" id="notes" rows="3" placeholder="Misal: Berisi 7 Laptop, 1 Meja, 3 Bangku - Dipinjamkan ke Yayasan PKT"
+                  class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">{{ old('notes', $asset->notes ?? '') }}</textarea>
+        @error('notes')
             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
         @enderror
     </div>

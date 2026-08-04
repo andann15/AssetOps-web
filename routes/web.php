@@ -35,6 +35,14 @@ Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionM
 
 // Redirect lama /admin/divisions ke /admin/work-units agar tidak 404
 Route::redirect('/admin/divisions', '/admin/work-units')->middleware(['auth']);
+
+Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
+    ->prefix('admin/work-unit-assets')
+    ->name('admin.work-unit-assets.')
+    ->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'index'])->name('index');
+        Route::get('/export', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'exportCsv'])->name('export');
+    });
 Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
     ->prefix('admin/brands')
     ->name('admin.brands.')
