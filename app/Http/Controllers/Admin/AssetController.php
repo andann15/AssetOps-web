@@ -43,8 +43,13 @@ class AssetController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $this->validateAsset($request);
-        $validated['work_unit_id'] = null; // Pastikan aset individu tidak punya work_unit
-        
+        $validated['work_unit_id'] = null;
+
+        // Auto-generate kode aset jika tidak diisi
+        if (empty($validated['code'])) {
+            $validated['code'] = $this->generateCode();
+        }
+
         Asset::create($validated);
 
         return redirect()->route('admin.assets.index')->with('success', 'Aset berhasil ditambahkan.');
@@ -80,18 +85,30 @@ class AssetController extends Controller
         $codeRule = 'unique:assets,code' . ($asset ? ',' . $asset->id : '');
 
         return $request->validate([
-            'code' => ['required', 'string', 'max:255', $codeRule],
-            'name' => ['required', 'string', 'max:255'],
-            'asset_category_id' => ['required', 'exists:asset_categories,id'],
-            'brand_id' => ['nullable', 'exists:brands,id'],
-            'model' => ['nullable', 'string', 'max:255'],
-            'serial_number' => ['nullable', 'string', 'max:255'],
-            'purchase_date' => ['nullable', 'date'],
-            'warranty_end' => ['nullable', 'date', 'after_or_equal:purchase_date'],
-            'location_id' => ['required', 'exists:locations,id'],
-            'status' => ['required', 'in:' . implode(',', array_keys(self::STATUSES))],
-            'current_user_id' => ['nullable', 'exists:users,id'],
+            'code'             => ['nullable', 'string', 'max:255', $codeRule],
+            'name'             => ['required', 'string', 'max:255'],
+            'asset_category_id'=> ['required', 'exists:asset_categories,id'],
+            'brand_id'         => ['nullable', 'exists:brands,id'],
+            'model'            => ['nullable', 'string', 'max:255'],
+            'serial_number'    => ['nullable', 'string', 'max:255'],
+            'purchase_date'    => ['nullable', 'date'],
+            'warranty_end'     => ['nullable', 'date', 'after_or_equal:purchase_date'],
+            'location_id'      => ['required', 'exists:locations,id'],
+            'status'           => ['required', 'in:' . implode(',', array_keys(self::STATUSES))],
+            'current_user_id'  => ['nullable', 'exists:users,id'],
         ]);
+    }
+
+    private function generateCode(): string
+    {
+        $year = now()->format('Y');
+        $prefix = 'ASET-' . $year . '-';
+        // Cari nomor urut terakhir untuk tahun ini
+        $last = Asset::where('code', 'like', $prefix . '%')
+            ->orderByRaw('CAST(SUBSTRING(code, ' . (strlen($prefix) + 1) . ') AS UNSIGNED) DESC')
+            ->value('code');
+        $next = $last ? ((int) substr($last, strlen($prefix))) + 1 : 1;
+        return $prefix . str_pad($next, 4, '0', STR_PAD_LEFT);
     }
 
     private function formOptions(): array

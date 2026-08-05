@@ -23,6 +23,7 @@ class WorkUnitController extends Controller
                         });
                   });
             })
+            ->orderByRaw('is_active DESC')
             ->orderBy('created_at', 'desc')
             ->paginate(15)
             ->withQueryString();
@@ -136,5 +137,17 @@ class WorkUnitController extends Controller
     {
         $workUnit->update(['is_active' => !$workUnit->is_active]);
         return back()->with('success', 'Status Unit Kerja berhasil diubah.');
+    }
+
+    public function destroy(WorkUnit $workUnit)
+    {
+        // Cek apakah ada aset yang masih terhubung
+        if ($workUnit->assets()->exists()) {
+            return back()->withErrors(['delete' => 'Unit Kerja tidak bisa dihapus karena masih memiliki aset yang terhubung.'])
+                         ->with('error', 'Unit Kerja tidak bisa dihapus karena masih memiliki aset yang terhubung.');
+        }
+        $workUnit->delete();
+        return redirect()->route('admin.work-units.index')
+            ->with('success', 'Unit Kerja berhasil dihapus.');
     }
 }

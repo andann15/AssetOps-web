@@ -31,6 +31,7 @@ Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionM
         Route::get('/{workUnit}/edit', [WorkUnitController::class, 'edit'])->name('edit');
         Route::put('/{workUnit}', [WorkUnitController::class, 'update'])->name('update');
         Route::patch('/{workUnit}/toggle', [WorkUnitController::class, 'toggleActive'])->name('toggle');
+        Route::delete('/{workUnit}', [WorkUnitController::class, 'destroy'])->name('destroy');
     });
 
 // Redirect lama /admin/divisions ke /admin/work-units agar tidak 404

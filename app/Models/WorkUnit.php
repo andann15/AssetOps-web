@@ -21,4 +21,9 @@ class WorkUnit extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function assets()
+    {
+        return $this->hasMany(\App\Models\Asset::class);
+    }
 }
