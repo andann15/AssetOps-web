@@ -84,16 +84,12 @@
                                     </td>
                                     <td class="px-5 py-4 text-center">
                                         @php
-                                            $statusMap = [
-                                                'active' => ['Aktif', 'bg-emerald-100 text-emerald-800'],
-                                                'in_storage' => ['Di Gudang', 'bg-blue-100 text-blue-800'],
-                                                'maintenance' => ['Perbaikan', 'bg-amber-100 text-amber-800'],
-                                                'damaged' => ['Rusak', 'bg-red-100 text-red-800'],
-                                                'disposed' => ['Dihapuskan', 'bg-gray-100 text-gray-800'],
-                                            ];
-                                            $statusInfo = $statusMap[$asset->status] ?? ['Unknown', 'bg-gray-100 text-gray-800'];
+                                            $statusName = isset($statuses[$asset->status]) ? $statuses[$asset->status]->name : $asset->status;
+                                            $statusIsActive = isset($statuses[$asset->status]) && $statuses[$asset->status]->is_active;
                                         @endphp
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusInfo[1] }}">{{ $statusInfo[0] }}</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusIsActive ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800' }}">
+                                            {{ $statusName }}
+                                        </span>
                                     </td>
                                     <td class="px-5 py-4 text-right">
                                         <div class="flex items-center justify-end gap-1.5">

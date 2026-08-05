@@ -4,8 +4,9 @@
 
 <div class="grid grid-cols-2 gap-4">
     <div class="mb-4 col-span-2">
-        <label for="code" class="block text-sm font-medium text-gray-700">Kode Aset / Kode Rombongan</label>
+        <label for="code" class="block text-sm font-medium text-gray-700">Nomor BAPBS/BAPBSAT</label>
         <input type="text" name="code" id="code" value="{{ old('code', $asset->code ?? '') }}"
+               placeholder="Contoh: BAPBS-2026-001"
                class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         @error('code')
             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
@@ -13,8 +14,9 @@
     </div>
 
     <div class="mb-4 col-span-2">
-        <label for="name" class="block text-sm font-medium text-gray-700">Nama Aset / Batch</label>
+        <label for="name" class="block text-sm font-medium text-gray-700">Unit Kerja / Departemen / Kompartemen</label>
         <input type="text" name="name" id="name" value="{{ old('name', $asset->name ?? '') }}"
+               placeholder="Contoh: Unit Shift A / Departemen Operasi / Kompartemen Produksi"
                class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         @error('name')
             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
@@ -52,9 +54,12 @@
     </div>
 
     <div class="mb-4">
-        <label for="model" class="block text-sm font-medium text-gray-700">Model (opsional)</label>
-        <input type="text" name="model" id="model" value="{{ old('model', $asset->model ?? '') }}"
-               class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <label for="model" class="block text-sm font-medium text-gray-700">Jenis Limbah</label>
+        <select name="model" id="model" class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <option value="">-- Pilih Jenis Limbah --</option>
+            <option value="Limbah" @selected(old('model', $asset->model ?? '') === 'Limbah')>Limbah</option>
+            <option value="Non Limbah" @selected(old('model', $asset->model ?? '') === 'Non Limbah')>Non Limbah</option>
+        </select>
         @error('model')
             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
         @enderror
@@ -107,9 +112,10 @@
     <div class="mb-4">
         <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
         <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-            @foreach ($statuses as $value => $label)
-                <option value="{{ $value }}" @selected(old('status', $asset->status ?? 'active') == $value)>
-                    {{ $label }}
+            <option value="">-- Pilih Status --</option>
+            @foreach ($statuses as $status)
+                <option value="{{ $status->slug }}" @selected(old('status', $asset->status ?? '') == $status->slug)>
+                    {{ $status->name }}
                 </option>
             @endforeach
         </select>

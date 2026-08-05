@@ -94,6 +94,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('admin.work-unit-asset-statuses.index') }}" class="group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300 {{ request()->routeIs('admin.work-unit-asset-statuses.*') ? 'bg-brand text-sidebar shadow-[0_8px_30px_rgb(0,0,0,0.04)] translate-x-1' : 'text-gray-300 hover:bg-sidebar-light hover:text-white rounded-lg' }}" title="Status Aset Unit">
+                        <svg class="w-6 h-6 flex-shrink-0 transition-transform duration-300 {{ request()->routeIs('admin.work-unit-asset-statuses.*') ? 'text-sidebar' : 'text-gray-500 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                        <span x-show="!sidebarCollapsed" class="font-medium text-sm whitespace-nowrap {{ request()->routeIs('admin.work-unit-asset-statuses.*') ? 'font-semibold' : '' }}">Status Aset Unit</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('admin.work-units.index') }}" class="group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300 {{ request()->routeIs('admin.work-units.*') ? 'bg-brand text-sidebar shadow-[0_8px_30px_rgb(0,0,0,0.04)] translate-x-1' : 'text-gray-300 hover:bg-sidebar-light hover:text-white rounded-lg' }}" title="Kelola Unit Kerja">
                         <svg class="w-6 h-6 flex-shrink-0 transition-transform duration-300 {{ request()->routeIs('admin.work-units.*') ? 'text-sidebar' : 'text-gray-500 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                         <span x-show="!sidebarCollapsed" class="font-medium text-sm whitespace-nowrap {{ request()->routeIs('admin.work-units.*') ? 'font-semibold' : '' }}">Kelola Unit Kerja</span>

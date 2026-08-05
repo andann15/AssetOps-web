@@ -8,6 +8,7 @@ use App\Models\AssetCategory;
 use App\Models\Brand;
 use App\Models\Location;
 use App\Models\WorkUnit;
+use App\Models\WorkUnitAssetStatus;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -15,14 +16,6 @@ use Illuminate\Support\Facades\Response;
 
 class WorkUnitAssetController extends Controller
 {
-    public const STATUSES = [
-        'active' => 'Aktif Digunakan',
-        'in_storage' => 'Di Gudang',
-        'maintenance' => 'Dalam Perbaikan',
-        'damaged' => 'Rusak',
-        'disposed' => 'Dihapuskan',
-    ];
-
     public function index(Request $request): View
     {
         $query = Asset::with(['workUnit.department.compartment', 'location'])
@@ -41,8 +34,9 @@ class WorkUnitAssetController extends Controller
         }
 
         $assets = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+        $statuses = WorkUnitAssetStatus::all()->keyBy('slug');
 
-        return view('admin.work-unit-assets.index', compact('assets'));
+        return view('admin.work-unit-assets.index', compact('assets', 'statuses'));
     }
 
     public function create(): View
@@ -93,12 +87,12 @@ class WorkUnitAssetController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'asset_category_id' => ['required', 'exists:asset_categories,id'],
             'brand_id' => ['nullable', 'exists:brands,id'],
-            'model' => ['nullable', 'string', 'max:255'],
+            'model' => ['nullable', 'in:Limbah,Non Limbah'],
             'serial_number' => ['nullable', 'string', 'max:255'],
             'purchase_date' => ['nullable', 'date'],
             'warranty_end' => ['nullable', 'date', 'after_or_equal:purchase_date'],
             'location_id' => ['required', 'exists:locations,id'],
-            'status' => ['required', 'in:' . implode(',', array_keys(self::STATUSES))],
+            'status' => ['required', 'exists:work_unit_asset_statuses,slug'],
             'work_unit_id' => ['required', 'exists:work_units,id'],
             'notes' => ['nullable', 'string'],
         ]);
@@ -111,7 +105,7 @@ class WorkUnitAssetController extends Controller
             'brands' => Brand::where('is_active', true)->orderBy('name')->get(),
             'locations' => Location::where('is_active', true)->orderBy('name')->get(),
             'workUnits' => WorkUnit::with('department.compartment')->where('is_active', true)->orderBy('name')->get(),
-            'statuses' => self::STATUSES,
+            'statuses' => WorkUnitAssetStatus::where('is_active', true)->orderBy('order')->orderBy('name')->get(),
         ];
     }
 
@@ -151,6 +145,8 @@ class WorkUnitAssetController extends Controller
         ];
 
         $callback = function() use($assets, $columns) {
+            $statuses = WorkUnitAssetStatus::all()->keyBy('slug');
+            
             $file = fopen('php://output', 'w');
             fputs($file, "\xEF\xBB\xBF"); // BOM for excel
             fputcsv($file, $columns, ';');
@@ -159,13 +155,14 @@ class WorkUnitAssetController extends Controller
             $file = fopen('php://output', 'a');
             foreach ($assets as $asset) {
                 $workUnitName = $asset->workUnit ? $asset->workUnit->name . ' (' . ($asset->workUnit->department->name ?? '-') . ')' : '-';
+                $statusName = isset($statuses[$asset->status]) ? $statuses[$asset->status]->name : $asset->status;
                 
                 $row = [
                     $asset->code,
                     $asset->name,
                     $workUnitName,
                     $asset->location->name ?? '-',
-                    $asset->status,
+                    $statusName,
                     $asset->notes ?? '-'
                 ];
 

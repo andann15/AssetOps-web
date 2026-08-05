@@ -49,6 +49,19 @@ Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionM
         Route::delete('/{workUnitAsset}', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'destroy'])->name('destroy');
         Route::get('/{workUnitAsset}/export-single', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'exportSingle'])->name('export-single');
     });
+
+Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
+    ->prefix('admin/work-unit-asset-statuses')
+    ->name('admin.work-unit-asset-statuses.')
+    ->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\WorkUnitAssetStatusController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\WorkUnitAssetStatusController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\WorkUnitAssetStatusController::class, 'store'])->name('store');
+        Route::get('/{workUnitAssetStatus}/edit', [\App\Http\Controllers\Admin\WorkUnitAssetStatusController::class, 'edit'])->name('edit');
+        Route::put('/{workUnitAssetStatus}', [\App\Http\Controllers\Admin\WorkUnitAssetStatusController::class, 'update'])->name('update');
+        Route::delete('/{workUnitAssetStatus}', [\App\Http\Controllers\Admin\WorkUnitAssetStatusController::class, 'destroy'])->name('destroy');
+        Route::patch('/{workUnitAssetStatus}/toggle', [\App\Http\Controllers\Admin\WorkUnitAssetStatusController::class, 'toggle'])->name('toggle');
+    });
 Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
     ->prefix('admin/brands')
     ->name('admin.brands.')
