@@ -43,15 +43,8 @@ class WorkUnitController extends Controller
 
         $departmentId = $request->department_id;
         if ($request->filled('new_department_name')) {
-            if (!$compartmentId) {
-                return back()->withErrors(['new_department_name' => 'Pilih atau buat Kompartemen terlebih dahulu.'])->withInput();
-            }
             $dept = Department::create(['compartment_id' => $compartmentId, 'name' => $request->new_department_name, 'is_active' => true]);
             $departmentId = $dept->id;
-        }
-
-        if (!$departmentId) {
-            return back()->withErrors(['department_id' => 'Pilih atau buat Departemen terlebih dahulu.'])->withInput();
         }
 
         WorkUnit::create([
@@ -89,15 +82,8 @@ class WorkUnitController extends Controller
 
         $departmentId = $request->department_id;
         if ($request->filled('new_department_name')) {
-            if (!$compartmentId) {
-                return back()->withErrors(['new_department_name' => 'Pilih atau buat Kompartemen terlebih dahulu.'])->withInput();
-            }
             $dept = Department::create(['compartment_id' => $compartmentId, 'name' => $request->new_department_name, 'is_active' => true]);
             $departmentId = $dept->id;
-        }
-
-        if (!$departmentId) {
-            return back()->withErrors(['department_id' => 'Pilih atau buat Departemen terlebih dahulu.'])->withInput();
         }
 
         $workUnit->update([

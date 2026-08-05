@@ -17,7 +17,7 @@
                     {{-- Kompartemen filter --}}
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
-                            <label class="block text-sm font-semibold text-gray-700">Kompartemen</label>
+                            <label class="block text-sm font-semibold text-gray-700">Kompartemen <span class="text-xs text-gray-400 font-normal ml-1">(Opsional)</span></label>
                             <button type="button" @click="newCompartment = !newCompartment; if(newCompartment) newDepartment = true;" class="text-xs font-semibold text-blue-600 hover:underline" x-text="newCompartment ? 'Pilih yang Ada' : '+ Tambah Baru'"></button>
                         </div>
                         
@@ -40,7 +40,7 @@
                     {{-- Departemen --}}
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
-                            <label for="department_id" class="block text-sm font-semibold text-gray-700">Departemen <span class="text-red-500">*</span></label>
+                            <label for="department_id" class="block text-sm font-semibold text-gray-700">Departemen <span class="text-xs text-gray-400 font-normal ml-1">(Opsional)</span></label>
                             <button type="button" x-show="!newCompartment" @click="newDepartment = !newDepartment" class="text-xs font-semibold text-blue-600 hover:underline" x-text="newDepartment ? 'Pilih yang Ada' : '+ Tambah Baru'"></button>
                         </div>
 
