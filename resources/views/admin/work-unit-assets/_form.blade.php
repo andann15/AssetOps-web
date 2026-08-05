@@ -126,11 +126,20 @@
 
     <div class="mb-4 col-span-2">
         <label for="work_unit_id" class="block text-sm font-medium text-gray-700">Penugasan Ke Unit Kerja</label>
-        <select name="work_unit_id" id="work_unit_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-            <option value="">-- Pilih Unit Kerja --</option>
+        <select name="work_unit_id" id="work_unit_id"
+                class="ts-select mt-1 block w-full border-gray-300 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+                data-placeholder="-- Cari & Pilih Unit Kerja --">
+            <option value=""></option>
             @foreach ($workUnits as $wu)
+                @php
+                    $deptName = $wu->department?->name;
+                    $compName = $wu->department?->compartment?->name;
+                    // Build a descriptive label: prioritize lower levels first
+                    $parts = array_filter([$compName, $deptName, $wu->name]);
+                    $label = implode(' › ', $parts) ?: '(tanpa nama)';
+                @endphp
                 <option value="{{ $wu->id }}" @selected(old('work_unit_id', $asset->work_unit_id ?? '') == $wu->id)>
-                    {{ $wu->name }} ({{ $wu->department->name ?? '-' }} / {{ $wu->department->compartment->name ?? '-' }})
+                    {{ $label }}
                 </option>
             @endforeach
         </select>

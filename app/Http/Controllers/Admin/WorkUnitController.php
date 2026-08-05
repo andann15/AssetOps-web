@@ -10,12 +10,23 @@ use Illuminate\Http\Request;
 
 class WorkUnitController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
         $workUnits = WorkUnit::with('department.compartment')
+            ->when($search, function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhereHas('department', function ($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%")
+                        ->orWhereHas('compartment', function ($q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%");
+                        });
+                  });
+            })
             ->orderBy('created_at', 'desc')
-            ->paginate(15);
-        return view('admin.work-units.index', compact('workUnits'));
+            ->paginate(15)
+            ->withQueryString();
+        return view('admin.work-units.index', compact('workUnits', 'search'));
     }
 
     public function create()

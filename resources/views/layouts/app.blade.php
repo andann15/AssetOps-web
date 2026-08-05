@@ -13,6 +13,9 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600|poppins:600,700,800&display=swap" rel="stylesheet" />
 
+        <!-- TomSelect -->
+        <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css" rel="stylesheet">
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
@@ -39,5 +42,19 @@
                 </main>
             </div>
         </div>
+
+        <!-- TomSelect JS + Auto Init -->
+        <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('select.ts-select').forEach(function (el) {
+                    new TomSelect(el, {
+                        placeholder: el.dataset.placeholder || '-- Pilih --',
+                        allowEmptyOption: true,
+                        maxOptions: null,
+                    });
+                });
+            });
+        </script>
     </body>
 </html>

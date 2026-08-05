@@ -102,10 +102,18 @@ class WorkUnitAssetController extends Controller
     {
         return [
             'categories' => AssetCategory::where('is_active', true)->orderBy('name')->get(),
-            'brands' => Brand::where('is_active', true)->orderBy('name')->get(),
-            'locations' => Location::where('is_active', true)->orderBy('name')->get(),
-            'workUnits' => WorkUnit::with('department.compartment')->where('is_active', true)->orderBy('name')->get(),
-            'statuses' => WorkUnitAssetStatus::where('is_active', true)->orderBy('order')->orderBy('name')->get(),
+            'brands'     => Brand::where('is_active', true)->orderBy('name')->get(),
+            'locations'  => Location::where('is_active', true)->orderBy('name')->get(),
+            'workUnits'  => WorkUnit::with('department.compartment')
+                                ->where('is_active', true)
+                                ->get()
+                                ->sortBy([
+                                    fn($a, $b) => strcmp($a->department?->compartment?->name ?? '', $b->department?->compartment?->name ?? ''),
+                                    fn($a, $b) => strcmp($a->department?->name ?? '', $b->department?->name ?? ''),
+                                    fn($a, $b) => strcmp($a->name ?? '', $b->name ?? ''),
+                                ])
+                                ->values(),
+            'statuses'   => WorkUnitAssetStatus::where('is_active', true)->orderBy('order')->orderBy('name')->get(),
         ];
     }
 
@@ -154,7 +162,12 @@ class WorkUnitAssetController extends Controller
             
             $file = fopen('php://output', 'a');
             foreach ($assets as $asset) {
-                $workUnitName = $asset->workUnit ? $asset->workUnit->name . ' (' . ($asset->workUnit->department->name ?? '-') . ')' : '-';
+                $parts = array_filter([
+                    $asset->workUnit?->department?->compartment?->name,
+                    $asset->workUnit?->department?->name,
+                    $asset->workUnit?->name,
+                ]);
+                $workUnitName = $asset->workUnit ? implode(' › ', $parts) : '-';
                 $statusName = isset($statuses[$asset->status]) ? $statuses[$asset->status]->name : $asset->status;
                 
                 $row = [
