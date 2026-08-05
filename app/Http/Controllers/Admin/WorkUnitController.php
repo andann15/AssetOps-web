@@ -56,14 +56,8 @@ class WorkUnitController extends Controller
         }
 
         $workUnitName = $validated['name'] ?? null;
-        if (empty($workUnitName)) {
-            if ($departmentName) {
-                $workUnitName = $departmentName;
-            } elseif ($compartmentName) {
-                $workUnitName = $compartmentName;
-            } else {
-                return back()->withErrors(['name' => 'Minimal salah satu (Kompartemen, Departemen, atau Unit Kerja) harus diisi.'])->withInput();
-            }
+        if (empty($workUnitName) && empty($departmentId) && empty($compartmentId)) {
+            return back()->withErrors(['name' => 'Minimal salah satu (Kompartemen, Departemen, atau Unit Kerja) harus diisi.'])->withInput();
         }
 
         WorkUnit::create([
@@ -114,14 +108,8 @@ class WorkUnitController extends Controller
         }
 
         $workUnitName = $validated['name'] ?? null;
-        if (empty($workUnitName)) {
-            if ($departmentName) {
-                $workUnitName = $departmentName;
-            } elseif ($compartmentName) {
-                $workUnitName = $compartmentName;
-            } else {
-                return back()->withErrors(['name' => 'Minimal salah satu (Kompartemen, Departemen, atau Unit Kerja) harus diisi.'])->withInput();
-            }
+        if (empty($workUnitName) && empty($departmentId) && empty($compartmentId)) {
+            return back()->withErrors(['name' => 'Minimal salah satu (Kompartemen, Departemen, atau Unit Kerja) harus diisi.'])->withInput();
         }
 
         $workUnit->update([

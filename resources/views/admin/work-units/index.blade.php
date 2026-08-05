@@ -17,9 +17,9 @@
                 <table class="min-w-full divide-y divide-gray-100">
                     <thead>
                         <tr>
-                            <th class="px-5 py-3 text-left text-xs font-medium text-gray-500">Unit Kerja</th>
-                            <th class="px-5 py-3 text-left text-xs font-medium text-gray-500">Departemen</th>
                             <th class="px-5 py-3 text-left text-xs font-medium text-gray-500">Kompartemen</th>
+                            <th class="px-5 py-3 text-left text-xs font-medium text-gray-500">Departemen</th>
+                            <th class="px-5 py-3 text-left text-xs font-medium text-gray-500">Unit Kerja</th>
                             <th class="px-5 py-3 text-left text-xs font-medium text-gray-500">Status</th>
                             <th class="px-5 py-3 text-right text-xs font-medium text-gray-500">Aksi</th>
                         </tr>
@@ -27,9 +27,9 @@
                     <tbody class="divide-y divide-gray-100">
                         @forelse ($workUnits as $workUnit)
                             <tr class="hover:bg-gray-50">
-                                <td class="px-5 py-3 text-sm font-medium text-gray-800">{{ $workUnit->name }}</td>
+                                <td class="px-5 py-3 text-sm text-gray-800">{{ $workUnit->department?->compartment?->name ?? '-' }}</td>
                                 <td class="px-5 py-3 text-sm text-gray-600">{{ $workUnit->department?->name ?? '-' }}</td>
-                                <td class="px-5 py-3 text-sm text-gray-500">{{ $workUnit->department?->compartment?->name ?? '-' }}</td>
+                                <td class="px-5 py-3 text-sm text-gray-500">{{ $workUnit->name ?? '-' }}</td>
                                 <td class="px-5 py-3"><x-ui.badge :active="$workUnit->is_active" /></td>
                                 <td class="px-5 py-3 text-right space-x-3">
                                     <a href="{{ route('admin.work-units.edit', $workUnit) }}" class="text-blue-600 hover:underline text-sm font-medium">Edit</a>
