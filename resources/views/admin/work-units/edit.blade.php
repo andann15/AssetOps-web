@@ -25,7 +25,7 @@
                             <select id="compartment_filter" name="compartment_id" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
                                 <option value="">-- Semua Kompartemen --</option>
                                 @foreach ($compartments as $comp)
-                                    <option value="{{ $comp->id }}" {{ $workUnit->department->compartment_id == $comp->id ? 'selected' : '' }}>
+                                    <option value="{{ $comp->id }}" {{ $workUnit->department?->compartment_id == $comp->id ? 'selected' : '' }}>
                                         {{ $comp->name }}
                                     </option>
                                 @endforeach
