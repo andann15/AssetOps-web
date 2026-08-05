@@ -44,7 +44,7 @@
                                 <td class="px-4 py-3">{{ $asset->code }}</td>
                                 <td class="px-4 py-3">{{ $asset->name }}</td>
                                 <td class="px-4 py-3">{{ $asset->category->name }}</td>
-                                <td class="px-4 py-3">{{ $asset->brand->name }}</td>
+                                <td class="px-4 py-3">{{ $asset->brand->name ?? '-' }}</td>
                                 <td class="px-4 py-3">{{ $asset->location->name }}</td>
                                 <td class="px-4 py-3">{{ $statuses[$asset->status] ?? $asset->status }}</td>
                                 @can('assets.edit')
