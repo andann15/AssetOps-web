@@ -103,8 +103,9 @@ class AssetController extends Controller
     {
         $year = now()->format('Y');
         $prefix = 'ASET-' . $year . '-';
-        // Cari nomor urut terakhir untuk tahun ini
-        $last = Asset::where('code', 'like', $prefix . '%')
+        // Cari nomor urut terakhir untuk tahun ini, termasuk yang sudah dihapus (soft delete)
+        $last = Asset::withTrashed()
+            ->where('code', 'like', $prefix . '%')
             ->orderByRaw('CAST(SUBSTRING(code, ' . (strlen($prefix) + 1) . ') AS UNSIGNED) DESC')
             ->value('code');
         $next = $last ? ((int) substr($last, strlen($prefix))) + 1 : 1;

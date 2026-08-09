@@ -49,6 +49,10 @@ class WorkUnitAssetController extends Controller
         $validated = $this->validateAsset($request);
         $validated['current_user_id'] = null;
 
+        if (empty($validated['code'])) {
+            $validated['code'] = $this->generateCode();
+        }
+
         Asset::create($validated);
 
         return redirect()->route('admin.work-unit-assets.index')->with('success', 'Aset Unit Kerja berhasil ditambahkan.');
@@ -83,7 +87,7 @@ class WorkUnitAssetController extends Controller
         $codeRule = 'unique:assets,code' . ($asset ? ',' . $asset->id : '');
 
         return $request->validate([
-            'code' => ['required', 'string', 'max:255', $codeRule],
+            'code' => ['nullable', 'string', 'max:255', $codeRule],
             'name' => ['required', 'string', 'max:255'],
             'asset_category_id' => ['required', 'exists:asset_categories,id'],
             'brand_id' => ['nullable', 'exists:brands,id'],
@@ -115,6 +119,19 @@ class WorkUnitAssetController extends Controller
                                 ->values(),
             'statuses'   => WorkUnitAssetStatus::where('is_active', true)->orderBy('order')->orderBy('name')->get(),
         ];
+    }
+
+    private function generateCode(): string
+    {
+        $year = now()->format('Y');
+        $prefix = 'ASET-' . $year . '-';
+        // Cari nomor urut terakhir untuk tahun ini, termasuk yang sudah dihapus (soft delete)
+        $last = Asset::withTrashed()
+            ->where('code', 'like', $prefix . '%')
+            ->orderByRaw('CAST(SUBSTRING(code, ' . (strlen($prefix) + 1) . ') AS UNSIGNED) DESC')
+            ->value('code');
+        $next = $last ? ((int) substr($last, strlen($prefix))) + 1 : 1;
+        return $prefix . str_pad($next, 4, '0', STR_PAD_LEFT);
     }
 
     public function exportCsv()
