@@ -2,6 +2,7 @@
   "version": 2,
   "buildCommand": "echo 'Build skipped - assets pre-built'",
   "installCommand": "composer install --optimize-autoloader 2>/dev/null || echo 'Composer done'",
+  "outputDirectory": "public",
   "functions": {
     "api/index.php": {
       "runtime": "vercel-php@0.7.2"
@@ -9,16 +10,7 @@
   },
   "routes": [
     {
-      "src": "/build/assets/(.*)",
-      "dest": "/public/build/assets/$1"
-    },
-    {
-      "src": "/build/(.*)",
-      "dest": "/public/build/$1"
-    },
-    {
-      "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp|map))",
-      "dest": "/public/$1"
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
