@@ -39,18 +39,22 @@ echo "<!-- SESSION_DRIVER: " . (getenv('SESSION_DRIVER') ?: 'NOT SET') . " -->\n
 
 ob_start();
 try {
+    // Bootstrap Laravel
     require $root . '/public/index.php';
 } catch (\Throwable $e) {
     ob_end_clean();
     echo "<h1>ORIGINAL Error: " . get_class($e) . "</h1>";
     echo "<b>Message:</b> " . htmlspecialchars($e->getMessage()) . "<br><br>";
     echo "<b>File:</b> " . $e->getFile() . " line " . $e->getLine() . "<br><br>";
-    $prev = $e->getPrevious();
-    if ($prev) {
-        echo "<h2>Previous Exception:</h2>";
-        echo "<b>Message:</b> " . htmlspecialchars($prev->getMessage()) . "<br>";
-        echo "<b>File:</b> " . $prev->getFile() . " line " . $prev->getLine() . "<br>";
+    
+    echo "<h2>Laravel Log File (/tmp/storage/logs/laravel.log):</h2>";
+    $logFile = '/tmp/storage/logs/laravel.log';
+    if (file_exists($logFile)) {
+        echo "<pre style='background:#333;color:#fff;padding:10px;overflow:auto;max-height:500px;'>";
+        echo htmlspecialchars(file_get_contents($logFile));
+        echo "</pre>";
+    } else {
+        echo "<p>Log file does not exist.</p>";
     }
-    echo "<pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
 }
 ob_end_flush();
