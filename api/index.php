@@ -7,44 +7,60 @@
 
 $root = dirname(__DIR__);
 
-// Vercel is read-only except for /tmp - symlink storage to /tmp
-$storagePath = $root . '/storage';
-$tmpStorage = '/tmp/storage';
+// Vercel filesystem is read-only except /tmp
+// Create writable storage directories in /tmp
+$storagePaths = [
+    '/tmp/storage',
+    '/tmp/storage/app',
+    '/tmp/storage/app/public',
+    '/tmp/storage/framework',
+    '/tmp/storage/framework/cache',
+    '/tmp/storage/framework/cache/data',
+    '/tmp/storage/framework/sessions',
+    '/tmp/storage/framework/testing',
+    '/tmp/storage/framework/views',
+    '/tmp/storage/logs',
+    '/tmp/bootstrap/cache',
+];
 
-if (!is_dir($tmpStorage)) {
-    $dirs = [
-        '/tmp/storage',
-        '/tmp/storage/app',
-        '/tmp/storage/app/public',
-        '/tmp/storage/framework',
-        '/tmp/storage/framework/cache',
-        '/tmp/storage/framework/cache/data',
-        '/tmp/storage/framework/sessions',
-        '/tmp/storage/framework/testing',
-        '/tmp/storage/framework/views',
-        '/tmp/storage/logs',
-    ];
-    foreach ($dirs as $dir) {
-        if (!is_dir($dir)) {
-            mkdir($dir, 0775, true);
-        }
-    }
-
-    // Copy views if needed
-    if (is_dir($storagePath . '/framework/views')) {
-        foreach (glob($storagePath . '/framework/views/*') as $file) {
-            copy($file, $tmpStorage . '/framework/views/' . basename($file));
-        }
+foreach ($storagePaths as $path) {
+    if (!is_dir($path)) {
+        mkdir($path, 0775, true);
     }
 }
 
-// Redirect storage writes to /tmp
-if (!is_link($storagePath . '/framework/cache')) {
-    // We can't symlink on Vercel, set env vars instead
+// Replace storage symlinks to point to /tmp
+$storageDirs = [
+    'framework/cache',
+    'framework/cache/data',
+    'framework/sessions',
+    'framework/views',
+    'framework/testing',
+    'logs',
+    'app',
+    'app/public',
+];
+
+// Override storage path so Laravel writes to /tmp/storage
+putenv('STORAGE_PATH=/tmp/storage');
+$_ENV['STORAGE_PATH'] = '/tmp/storage';
+$_SERVER['STORAGE_PATH'] = '/tmp/storage';
+
+// Override bootstrap cache path
+if (!is_dir('/tmp/bootstrap/cache')) {
+    mkdir('/tmp/bootstrap/cache', 0775, true);
 }
 
-// Tell Laravel to use /tmp for writable storage
-$_ENV['APP_STORAGE'] = $tmpStorage;
+// Copy compiled bootstrap/cache to /tmp if exists
+$bootstrapCache = $root . '/bootstrap/cache';
+if (is_dir($bootstrapCache)) {
+    foreach (glob($bootstrapCache . '/*.php') as $file) {
+        $dest = '/tmp/bootstrap/cache/' . basename($file);
+        if (!file_exists($dest)) {
+            copy($file, $dest);
+        }
+    }
+}
 
 // Set correct paths for Laravel
 $_SERVER['SCRIPT_FILENAME'] = $root . '/public/index.php';
