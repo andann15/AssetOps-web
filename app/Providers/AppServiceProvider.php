@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (str_contains(request()->getHost(), 'ngrok')) {
+        if (str_contains(request()->getHost(), 'ngrok') || str_contains(request()->getHost(), 'vercel.app') || app()->environment('production')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
     }
