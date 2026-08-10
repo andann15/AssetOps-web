@@ -45,6 +45,10 @@ Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionM
         Route::get('/create', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'create'])->name('create');
         Route::post('/', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'store'])->name('store');
         Route::get('/export', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'exportCsv'])->name('export');
+        Route::get('/export-pdf', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'exportPdf'])->name('export-pdf');
+        Route::get('/trash', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'trash'])->name('trash');
+        Route::post('/{id}/restore', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'restore'])->name('restore');
+        Route::delete('/{id}/force-delete', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'forceDelete'])->name('force-delete');
         Route::get('/{workUnitAsset}/edit', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'edit'])->name('edit');
         Route::put('/{workUnitAsset}', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'update'])->name('update');
         Route::delete('/{workUnitAsset}', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'destroy'])->name('destroy');
@@ -126,14 +130,23 @@ Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\RoleMiddlew
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/users/export-csv', [\App\Http\Controllers\Admin\UserController::class, 'exportCsv'])->name('users.export-csv');
+        Route::get('/users/export-pdf', [\App\Http\Controllers\Admin\UserController::class, 'exportPdf'])->name('users.export-pdf');
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
     });
 
 Route::middleware(['auth'])->prefix('tickets')->name('tickets.')->group(function () {
     Route::get('/', [TicketController::class, 'index'])->name('index');
+    Route::get('/export-csv', [TicketController::class, 'exportCsv'])->name('export-csv');
+    Route::get('/export-pdf', [TicketController::class, 'exportPdf'])->name('export-pdf');
     Route::get('/create', [TicketController::class, 'create'])->name('create');
     Route::post('/', [TicketController::class, 'store'])->name('store');
+    Route::post('/{id}/restore', [TicketController::class, 'restore'])
+        ->middleware([\Spatie\Permission\Middleware\RoleMiddleware::class . ':admin'])
+        ->name('restore');
+    Route::delete('/{id}/force-delete', [TicketController::class, 'forceDelete'])
+        ->middleware([\Spatie\Permission\Middleware\RoleMiddleware::class . ':admin'])
+        ->name('force-delete');
     Route::get('/{ticket}', [TicketController::class, 'show'])->name('show');
     Route::patch('/{ticket}/approve', [TicketController::class, 'approve'])->name('approve');
     Route::patch('/{ticket}/reject', [TicketController::class, 'reject'])->name('reject');
@@ -142,6 +155,14 @@ Route::middleware(['auth'])->prefix('tickets')->name('tickets.')->group(function
     Route::patch('/{ticket}/close', [TicketController::class, 'close'])->name('close');
     Route::patch('/{ticket}/cancel', [TicketController::class, 'cancel'])->name('cancel');
     Route::delete('/{ticket}', [TicketController::class, 'destroy'])->name('destroy');
+    });
+
+Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\RoleMiddleware::class . ':admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/recovery', [\App\Http\Controllers\Admin\RecoveryController::class, 'index'])->name('recovery.index');
     });
 
 Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\RoleMiddleware::class . ':operator'])
@@ -171,6 +192,26 @@ Route::middleware('auth')->group(function () {
 Route::get('/admin/assets', [AssetController::class, 'index'])
     ->middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':assets.view'])
     ->name('admin.assets.index');
+
+Route::get('/admin/assets/export-csv', [AssetController::class, 'exportCsv'])
+    ->middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':assets.view'])
+    ->name('admin.assets.export-csv');
+
+Route::get('/admin/assets/export-pdf', [AssetController::class, 'exportPdf'])
+    ->middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':assets.view'])
+    ->name('admin.assets.export-pdf');
+
+Route::get('/admin/assets/trash', [AssetController::class, 'trash'])
+    ->middleware(['auth', 'verified', \Spatie\Permission\Middleware\RoleMiddleware::class . ':admin'])
+    ->name('admin.assets.trash');
+
+Route::post('/admin/assets/{id}/restore', [AssetController::class, 'restore'])
+    ->middleware(['auth', 'verified', \Spatie\Permission\Middleware\RoleMiddleware::class . ':admin'])
+    ->name('admin.assets.restore');
+
+Route::delete('/admin/assets/{id}/force-delete', [AssetController::class, 'forceDelete'])
+    ->middleware(['auth', 'verified', \Spatie\Permission\Middleware\RoleMiddleware::class . ':admin'])
+    ->name('admin.assets.force-delete');
 
 Route::get('/admin/assets/create', [AssetController::class, 'create'])
     ->middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':assets.create'])

@@ -11,6 +11,8 @@ use App\Services\TicketStateMachine;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Response;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TicketController extends Controller
 {
@@ -33,7 +35,21 @@ class TicketController extends Controller
             $query->where('created_by', $request->user()->id);
         }
 
-        $tickets = $query->latest()->paginate(15);
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('ticket_number', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhereHas('asset', function ($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('creator', function ($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $tickets = $query->latest()->paginate(15)->withQueryString();
 
         return view('tickets.index', compact('tickets'));
     }
@@ -178,6 +194,24 @@ class TicketController extends Controller
         return redirect()->route('tickets.index')->with('success', 'Tiket berhasil dihapus (soft delete).');
     }
 
+    public function restore($id): RedirectResponse
+    {
+        $this->authorize('delete', Ticket::class); // using delete policy for restore
+        $ticket = Ticket::onlyTrashed()->findOrFail($id);
+        $ticket->restore();
+
+        return back()->with('success', 'Tiket berhasil dikembalikan.');
+    }
+
+    public function forceDelete($id): RedirectResponse
+    {
+        $this->authorize('delete', Ticket::class); // using delete policy for force delete
+        $ticket = Ticket::onlyTrashed()->findOrFail($id);
+        $ticket->forceDelete();
+
+        return back()->with('success', 'Tiket dihapus secara permanen.');
+    }
+
     private function generateTicketNumber(): string
     {
         $year = now()->year;
@@ -189,5 +223,105 @@ class TicketController extends Controller
         $nextSequence = $lastNumber ? ((int) substr($lastNumber, -4)) + 1 : 1;
 
         return sprintf('TK-%d-%04d', $year, $nextSequence);
+    }
+
+    public function exportCsv(Request $request)
+    {
+        $this->authorize('viewAny', Ticket::class);
+        $query = Ticket::with(['asset', 'priority', 'creator', 'assignedOperator']);
+        if ($request->user()->can('tickets.view-all')) {
+            if ($request->user()->hasRole('operator') && !$request->user()->hasRole('admin')) {
+                $query->whereNotIn('status', ['rejected', 'cancelled']);
+            }
+        } else {
+            $query->where('created_by', $request->user()->id);
+        }
+        $tickets = $query->latest()->get();
+        return $this->generateCsv($tickets, "daftar_tiket_" . date('Y-m-d_H-i') . ".csv");
+    }
+
+    private function generateCsv($tickets, $filename)
+    {
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = [
+            'Nomor Tiket',
+            'Aset',
+            'Pembuat',
+            'Operator',
+            'Prioritas',
+            'Status',
+            'Dibuat Tanggal'
+        ];
+
+        $callback = function() use($tickets, $columns) {
+            $file = fopen('php://output', 'w');
+            fputs($file, "\xEF\xBB\xBF");
+            fputcsv($file, $columns, ';');
+            
+            foreach ($tickets as $ticket) {
+                $statusMap = [
+                    'waiting_approval' => 'Menunggu Persetujuan',
+                    'assigned' => 'Ditugaskan',
+                    'checking' => 'Sedang Diperiksa',
+                    'completed' => 'Selesai',
+                    'closed' => 'Ditutup',
+                    'rejected' => 'Ditolak',
+                    'cancelled' => 'Dibatalkan',
+                ];
+                $statusName = $statusMap[$ticket->status] ?? $ticket->status;
+                
+                $row = [
+                    $ticket->ticket_number,
+                    $ticket->asset->name ?? '-',
+                    $ticket->creator->name ?? '-',
+                    $ticket->assignedOperator->name ?? '-',
+                    $ticket->priority->name ?? '-',
+                    $statusName,
+                    $ticket->created_at->format('d/m/Y H:i')
+                ];
+                fputcsv($file, $row, ';');
+            }
+            fclose($file);
+        };
+
+        return Response::stream($callback, 200, $headers);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $this->authorize('viewAny', Ticket::class);
+        $query = Ticket::with(['asset', 'priority', 'creator', 'assignedOperator']);
+        if ($request->user()->can('tickets.view-all')) {
+            if ($request->user()->hasRole('operator') && !$request->user()->hasRole('admin')) {
+                $query->whereNotIn('status', ['rejected', 'cancelled']);
+            }
+        } else {
+            $query->where('created_by', $request->user()->id);
+        }
+        $tickets = $query->latest()->get();
+
+        $statusMap = [
+            'waiting_approval' => 'Menunggu Persetujuan',
+            'assigned' => 'Ditugaskan',
+            'checking' => 'Sedang Diperiksa',
+            'completed' => 'Selesai',
+            'closed' => 'Ditutup',
+            'rejected' => 'Ditolak',
+            'cancelled' => 'Dibatalkan',
+        ];
+
+        $pdf = Pdf::loadView('pdf.tickets', [
+            'tickets' => $tickets,
+            'statusMap' => $statusMap
+        ]);
+        
+        return $pdf->download("daftar_tiket_" . date('Y-m-d_H-i') . ".pdf");
     }
 }

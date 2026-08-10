@@ -10,9 +10,13 @@ use Illuminate\View\View;
 
 class LocationController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $locations = Location::orderBy('name')->paginate(10);
+        $query = Location::orderBy('name');
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+        $locations = $query->paginate(10)->withQueryString();
 
         return view('admin.locations.index', compact('locations'));
     }

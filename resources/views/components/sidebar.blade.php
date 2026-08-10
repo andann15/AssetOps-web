@@ -149,6 +149,12 @@
                         <span x-show="!sidebarCollapsed" class="font-medium text-sm whitespace-nowrap {{ request()->routeIs('admin.users.*') ? 'font-semibold' : '' }}">Manajemen Pengguna</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('admin.recovery.index') }}" class="group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300 {{ request()->routeIs('admin.recovery.*') ? 'bg-brand text-sidebar shadow-[0_8px_30px_rgb(0,0,0,0.04)] translate-x-1' : 'text-gray-300 hover:bg-sidebar-light hover:text-white rounded-lg' }}" title="Pusat Pemulihan">
+                        <svg class="w-6 h-6 flex-shrink-0 transition-transform duration-300 {{ request()->routeIs('admin.recovery.*') ? 'text-sidebar' : 'text-gray-500 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        <span x-show="!sidebarCollapsed" class="font-medium text-sm whitespace-nowrap {{ request()->routeIs('admin.recovery.*') ? 'font-semibold' : '' }}">Pusat Pemulihan</span>
+                    </a>
+                </li>
             </ul>
         </div>
         @endrole

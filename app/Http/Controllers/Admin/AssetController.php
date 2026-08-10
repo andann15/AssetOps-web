@@ -12,6 +12,8 @@ use App\Models\WorkUnit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Response;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AssetController extends Controller
 {
@@ -23,11 +25,22 @@ class AssetController extends Controller
         'disposed' => 'Dihapuskan',
     ];
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $assets = Asset::with(['category', 'brand', 'location'])
-            ->orderBy('name')
-            ->paginate(10);
+        $query = Asset::with(['category', 'brand', 'location'])->whereNull('work_unit_id');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhereHas('category', function ($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $assets = $query->orderBy('name')->paginate(10)->withQueryString();
 
         return view('admin.assets.index', [
             'assets' => $assets,
@@ -122,5 +135,93 @@ class AssetController extends Controller
             'workUnits' => WorkUnit::with('department.compartment')->where('is_active', true)->get(),
             'statuses' => self::STATUSES,
         ];
+    }
+
+    public function trash(): View
+    {
+        $assets = Asset::onlyTrashed()
+            ->with(['category', 'brand', 'location'])
+            ->orderBy('deleted_at', 'desc')
+            ->paginate(10);
+
+        return view('admin.assets.trash', [
+            'assets' => $assets,
+            'statuses' => self::STATUSES,
+        ]);
+    }
+
+    public function restore($id): RedirectResponse
+    {
+        $asset = Asset::onlyTrashed()->findOrFail($id);
+        $asset->restore();
+
+        return back()->with('success', 'Aset berhasil dikembalikan.');
+    }
+
+    public function forceDelete($id): RedirectResponse
+    {
+        $asset = Asset::onlyTrashed()->findOrFail($id);
+        $asset->forceDelete();
+
+        return back()->with('success', 'Aset dihapus secara permanen.');
+    }
+
+    public function exportCsv()
+    {
+        $assets = Asset::with(['category', 'brand', 'location'])->orderBy('name')->get();
+        return $this->generateCsv($assets, "daftar_aset_" . date('Y-m-d_H-i') . ".csv");
+    }
+
+    private function generateCsv($assets, $filename)
+    {
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = [
+            'Kode Aset',
+            'Nama Aset',
+            'Kategori',
+            'Merek',
+            'Lokasi',
+            'Status'
+        ];
+
+        $callback = function() use($assets, $columns) {
+            $file = fopen('php://output', 'w');
+            fputs($file, "\xEF\xBB\xBF");
+            fputcsv($file, $columns, ';');
+            
+            foreach ($assets as $asset) {
+                $statusName = self::STATUSES[$asset->status] ?? $asset->status;
+                $row = [
+                    $asset->code,
+                    $asset->name,
+                    $asset->category->name ?? '-',
+                    $asset->brand->name ?? '-',
+                    $asset->location->name ?? '-',
+                    $statusName
+                ];
+                fputcsv($file, $row, ';');
+            }
+            fclose($file);
+        };
+
+        return Response::stream($callback, 200, $headers);
+    }
+
+    public function exportPdf()
+    {
+        $assets = Asset::with(['category', 'brand', 'location'])->orderBy('name')->get();
+        $pdf = Pdf::loadView('pdf.assets', [
+            'assets' => $assets,
+            'statuses' => self::STATUSES
+        ]);
+        
+        return $pdf->download("daftar_aset_" . date('Y-m-d_H-i') . ".pdf");
     }
 }

@@ -10,9 +10,13 @@ use Illuminate\View\View;
 
 class TicketPriorityController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $ticketPriorities = TicketPriority::orderBy('sla_hours')->paginate(10);
+        $query = TicketPriority::orderBy('sla_hours');
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+        $ticketPriorities = $query->paginate(10)->withQueryString();
 
         return view('admin.ticket-priorities.index', compact('ticketPriorities'));
     }

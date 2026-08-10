@@ -10,9 +10,13 @@ use Illuminate\View\View;
 
 class BrandController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $brands = Brand::orderBy('name')->paginate(10);
+        $query = Brand::orderBy('name');
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+        $brands = $query->paginate(10)->withQueryString();
 
         return view('admin.brands.index', compact('brands'));
     }

@@ -8,12 +8,29 @@ use App\Models\WorkUnit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\Response;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request): View
     {
-        $users = User::with('workUnit.department.compartment', 'roles')->latest()->paginate(15);
+        $query = User::with('workUnit.department.compartment', 'roles');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('nik', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhereHas('workUnit', function ($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $users = $query->latest()->paginate(15)->withQueryString();
         return view('admin.users.index', compact('users'));
     }
 
@@ -92,5 +109,75 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil dihapus.');
+    }
+
+    public function exportCsv()
+    {
+        $users = User::with('workUnit.department.compartment')->orderBy('name')->get();
+        return $this->generateCsv($users, "daftar_pengguna_" . date('Y-m-d_H-i') . ".csv");
+    }
+
+    private function generateCsv($users, $filename)
+    {
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = [
+            'NIK',
+            'Nama',
+            'Email',
+            'Role',
+            'Unit Kerja'
+        ];
+
+        $callback = function() use($users, $columns) {
+            $file = fopen('php://output', 'w');
+            fputs($file, "\xEF\xBB\xBF");
+            fputcsv($file, $columns, ';');
+            
+            foreach ($users as $user) {
+                $roleMap = [
+                    'admin' => 'Admin',
+                    'operator' => 'Operator',
+                    'user' => 'User',
+                ];
+                $roleName = $roleMap[$user->role] ?? $user->role;
+                
+                $row = [
+                    $user->nik,
+                    $user->name,
+                    $user->email,
+                    $roleName,
+                    $user->workUnit->name ?? '-'
+                ];
+                fputcsv($file, $row, ';');
+            }
+            fclose($file);
+        };
+
+        return Response::stream($callback, 200, $headers);
+    }
+
+    public function exportPdf()
+    {
+        $users = User::with('workUnit.department.compartment')->orderBy('name')->get();
+        
+        $roleMap = [
+            'admin' => 'Admin',
+            'operator' => 'Operator',
+            'user' => 'User',
+        ];
+
+        $pdf = Pdf::loadView('pdf.users', [
+            'users' => $users,
+            'roleMap' => $roleMap
+        ]);
+        
+        return $pdf->download("daftar_pengguna_" . date('Y-m-d_H-i') . ".pdf");
     }
 }

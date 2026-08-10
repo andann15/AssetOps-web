@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Response;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class WorkUnitAssetController extends Controller
 {
@@ -202,5 +203,49 @@ class WorkUnitAssetController extends Controller
         };
 
         return Response::stream($callback, 200, $headers);
+    }
+
+    public function exportPdf()
+    {
+        $assets = Asset::with(['workUnit.department.compartment', 'location'])
+            ->whereNotNull('work_unit_id')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        $statuses = WorkUnitAssetStatus::all()->keyBy('slug');
+
+        $pdf = Pdf::loadView('pdf.work-unit-assets', [
+            'assets' => $assets,
+            'statuses' => $statuses
+        ]);
+        
+        return $pdf->download("monitoring_aset_unit_kerja_" . date('Y-m-d_H-i') . ".pdf");
+    }
+
+    public function trash(): View
+    {
+        $assets = Asset::onlyTrashed()
+            ->with(['workUnit.department.compartment', 'location'])
+            ->whereNotNull('work_unit_id')
+            ->orderBy('deleted_at', 'desc')
+            ->paginate(15);
+        $statuses = WorkUnitAssetStatus::all()->keyBy('slug');
+
+        return view('admin.work-unit-assets.trash', compact('assets', 'statuses'));
+    }
+
+    public function restore($id): RedirectResponse
+    {
+        $asset = Asset::onlyTrashed()->whereNotNull('work_unit_id')->findOrFail($id);
+        $asset->restore();
+
+        return back()->with('success', 'Aset Unit Kerja berhasil dikembalikan.');
+    }
+
+    public function forceDelete($id): RedirectResponse
+    {
+        $asset = Asset::onlyTrashed()->whereNotNull('work_unit_id')->findOrFail($id);
+        $asset->forceDelete();
+
+        return back()->with('success', 'Aset Unit Kerja dihapus secara permanen.');
     }
 }

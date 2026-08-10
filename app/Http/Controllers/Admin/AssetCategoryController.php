@@ -10,9 +10,13 @@ use Illuminate\View\View;
 
 class AssetCategoryController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $assetCategories = AssetCategory::orderBy('name')->paginate(10);
+        $query = AssetCategory::orderBy('name');
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+        $assetCategories = $query->paginate(10)->withQueryString();
 
         return view('admin.asset-categories.index', compact('assetCategories'));
     }

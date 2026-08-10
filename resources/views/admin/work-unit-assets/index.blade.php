@@ -5,7 +5,11 @@
                 <div class="flex items-center gap-2">
                     <a href="{{ route('admin.work-unit-assets.export') }}" class="group inline-flex items-center gap-2 px-4 py-2 border border-gray-200 text-gray-600 hover:border-brand hover:text-brand transition-colors duration-200 rounded-lg text-sm font-medium">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        Unduh Semua (CSV)
+                        Unduh CSV
+                    </a>
+                    <a href="{{ route('admin.work-unit-assets.export-pdf') }}" class="group inline-flex items-center gap-2 px-4 py-2 border border-gray-200 text-gray-600 hover:border-brand hover:text-brand transition-colors duration-200 rounded-lg text-sm font-medium">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Unduh PDF
                     </a>
                     <a href="{{ route('admin.work-unit-assets.create') }}" class="group inline-flex items-center gap-2 px-4 py-2 bg-brand text-sidebar hover:bg-brand/90 transition-colors duration-200 rounded-lg shadow-sm font-medium text-sm">
                         <svg class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>

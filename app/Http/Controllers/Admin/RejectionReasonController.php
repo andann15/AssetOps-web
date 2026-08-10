@@ -10,9 +10,13 @@ use Illuminate\View\View;
 
 class RejectionReasonController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $rejectionReasons = RejectionReason::orderBy('label')->paginate(10);
+        $query = RejectionReason::orderBy('label');
+        if ($request->filled('search')) {
+            $query->where('label', 'like', '%' . $request->search . '%');
+        }
+        $rejectionReasons = $query->paginate(10)->withQueryString();
 
         return view('admin.rejection-reasons.index', compact('rejectionReasons'));
     }
