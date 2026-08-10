@@ -6,6 +6,23 @@ error_reporting(E_ALL);
 
 $root = dirname(__DIR__);
 
+// Set Laravel to use /tmp for all auto-generated cache files
+$tmpBootstrapCache = '/tmp/bootstrap/cache';
+$_ENV['APP_SERVICES_CACHE'] = $tmpBootstrapCache . '/services.php';
+$_ENV['APP_PACKAGES_CACHE'] = $tmpBootstrapCache . '/packages.php';
+$_ENV['APP_CONFIG_CACHE'] = $tmpBootstrapCache . '/config.php';
+$_ENV['APP_ROUTES_CACHE'] = $tmpBootstrapCache . '/routes.php';
+$_ENV['APP_EVENTS_CACHE'] = $tmpBootstrapCache . '/events.php';
+putenv('APP_SERVICES_CACHE=' . $_ENV['APP_SERVICES_CACHE']);
+putenv('APP_PACKAGES_CACHE=' . $_ENV['APP_PACKAGES_CACHE']);
+putenv('APP_CONFIG_CACHE=' . $_ENV['APP_CONFIG_CACHE']);
+putenv('APP_ROUTES_CACHE=' . $_ENV['APP_ROUTES_CACHE']);
+putenv('APP_EVENTS_CACHE=' . $_ENV['APP_EVENTS_CACHE']);
+
+if (!is_dir($tmpBootstrapCache)) {
+    mkdir($tmpBootstrapCache, 0775, true);
+}
+
 $_SERVER['SCRIPT_FILENAME'] = $root . '/public/index.php';
 $_SERVER['SCRIPT_NAME']     = '/index.php';
 
