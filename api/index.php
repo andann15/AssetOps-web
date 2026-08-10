@@ -33,7 +33,23 @@ $uri = urldecode(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH));
 $file = $root . '/public' . $uri;
 
 if ($uri !== '/' && is_file($file)) {
-    return false; // Serve the file as-is
+    $ext = pathinfo($file, PATHINFO_EXTENSION);
+    $mimeTypes = [
+        'css' => 'text/css',
+        'js'  => 'application/javascript',
+        'png' => 'image/png',
+        'jpg' => 'image/jpeg',
+        'svg' => 'image/svg+xml',
+        'woff' => 'font/woff',
+        'woff2' => 'font/woff2',
+        'ico' => 'image/x-icon',
+    ];
+    if (isset($mimeTypes[$ext])) {
+        header('Content-Type: ' . $mimeTypes[$ext]);
+    }
+    header('Cache-Control: public, max-age=31536000');
+    readfile($file);
+    exit;
 }
 
 // Bootstrap Laravel
