@@ -10,6 +10,8 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->useLangPath(dirname(__DIR__) . '/lang')
+    ->useStoragePath(env('APP_STORAGE', dirname(__DIR__) . '/storage'))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
