@@ -151,6 +151,19 @@ class WorkUnitAssetController extends Controller
         return $this->generateCsv([$workUnitAsset], "aset_" . $workUnitAsset->code . "_" . date('Y-m-d_H-i') . ".csv");
     }
 
+    public function exportSinglePdf(Asset $workUnitAsset)
+    {
+        $workUnitAsset->load(['workUnit.department.compartment', 'location']);
+        $statuses = WorkUnitAssetStatus::all()->keyBy('slug');
+
+        $pdf = Pdf::loadView('pdf.work-unit-assets', [
+            'assets'   => collect([$workUnitAsset]),
+            'statuses' => $statuses,
+        ]);
+
+        return $pdf->download('aset_' . $workUnitAsset->code . '_' . date('Y-m-d_H-i') . '.pdf');
+    }
+
     private function generateCsv($assets, $filename)
     {
         $headers = [
@@ -189,10 +202,10 @@ class WorkUnitAssetController extends Controller
                 $statusName = isset($statuses[$asset->status]) ? $statuses[$asset->status]->name : $asset->status;
                 
                 $row = [
-                    '="' . $asset->code . '"', // Force Excel to treat as string to keep leading zeros
-                    $asset->name,
+                    '="' . ($asset->code ?? '') . '"', // Force Excel to treat as string to keep leading zeros
+                    $asset->name ?? '-',         // Unit Kerja = nama aset
                     $asset->location->name ?? '-',
-                    $workUnitName,
+                    $workUnitName,               // Penugasan Unit Kerja
                     $statusName,
                     $asset->notes ?? '-'
                 ];

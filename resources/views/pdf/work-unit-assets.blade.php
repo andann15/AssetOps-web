@@ -3,10 +3,10 @@
 <head>
     <title>Daftar Aset Unit Kerja</title>
     <style>
-        body { font-family: sans-serif; font-size: 12px; }
+        body { font-family: sans-serif; font-size: 11px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f4f4f4; }
+        th, td { border: 1px solid #ddd; padding: 6px 8px; text-align: left; }
+        th { background-color: #f4f4f4; font-weight: bold; }
         .header { text-align: center; margin-bottom: 20px; }
         .header h2 { margin: 0; padding: 0; }
         .header p { margin: 5px 0; color: #666; }
@@ -22,10 +22,10 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>Kode Aset</th>
-                <th>Nama Aset</th>
+                <th>Nomor BAPBS/BAPBSAT</th>
                 <th>Unit Kerja</th>
                 <th>Lokasi</th>
+                <th>Penugasan Unit Kerja</th>
                 <th>Status</th>
                 <th>Keterangan</th>
             </tr>
@@ -43,10 +43,10 @@
             @endphp
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td>{{ $asset->code }}</td>
-                <td>{{ $asset->name }}</td>
-                <td>{{ $workUnitName }}</td>
+                <td>{{ $asset->code ?? '-' }}</td>
+                <td>{{ $asset->name ?? '-' }}</td>
                 <td>{{ $asset->location->name ?? '-' }}</td>
+                <td>{{ $workUnitName }}</td>
                 <td>{{ $statusName }}</td>
                 <td>{{ $asset->notes ?? '-' }}</td>
             </tr>

@@ -53,6 +53,7 @@ Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionM
         Route::put('/{workUnitAsset}', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'update'])->name('update');
         Route::delete('/{workUnitAsset}', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'destroy'])->name('destroy');
         Route::get('/{workUnitAsset}/export-single', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'exportSingle'])->name('export-single');
+        Route::get('/{workUnitAsset}/export-single-pdf', [\App\Http\Controllers\Admin\WorkUnitAssetController::class, 'exportSinglePdf'])->name('export-single-pdf');
     });
 
 Route::middleware(['auth', 'verified', \Spatie\Permission\Middleware\PermissionMiddleware::class . ':divisions.manage'])
