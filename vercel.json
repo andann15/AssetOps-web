@@ -2,7 +2,7 @@
   "version": 2,
   "framework": null,
   "buildCommand": "echo 'Build skipped - assets pre-built'",
-  "installCommand": "composer install --no-dev --optimize-autoloader 2>/dev/null || echo 'Composer done'",
+  "installCommand": "composer install --optimize-autoloader 2>/dev/null || echo 'Composer done'",
   "outputDirectory": ".",
   "functions": {
     "api/index.php": {
