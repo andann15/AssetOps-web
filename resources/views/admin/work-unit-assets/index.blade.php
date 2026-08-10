@@ -48,11 +48,12 @@
                     <table class="min-w-full divide-y divide-gray-100">
                         <thead>
                             <tr class="bg-gray-50">
-                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Aset</th>
+                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nomor BAPBS/BAPBSAT</th>
                                 <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Unit Kerja</th>
                                 <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Lokasi</th>
-                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Keterangan</th>
+                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Penugasan Unit Kerja</th>
                                 <th class="px-5 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Keterangan</th>
                                 <th class="px-5 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
                             </tr>
                         </thead>
@@ -60,10 +61,13 @@
                             @forelse ($assets as $asset)
                                 <tr class="hover:bg-slate-50 transition-colors duration-200">
                                     <td class="px-5 py-4">
-                                        <div class="flex flex-col">
-                                            <span class="font-bold text-slate-900">{{ $asset->name }}</span>
-                                            <span class="text-xs text-gray-500 font-mono mt-0.5">{{ $asset->code }}</span>
-                                        </div>
+                                        <span class="font-bold text-slate-900">{{ $asset->code ?: '-' }}</span>
+                                    </td>
+                                    <td class="px-5 py-4">
+                                        <span class="font-medium text-slate-900">{{ $asset->name ?: '-' }}</span>
+                                    </td>
+                                    <td class="px-5 py-4 text-sm text-gray-700">
+                                        {{ $asset->location->name ?? '-' }}
                                     </td>
                                     <td class="px-5 py-4">
                                         <div class="flex flex-col">
@@ -76,16 +80,6 @@
                                             </span>
                                         </div>
                                     </td>
-                                    <td class="px-5 py-4 text-sm text-gray-700">
-                                        {{ $asset->location->name ?? '-' }}
-                                    </td>
-                                    <td class="px-5 py-4 text-sm text-gray-700 max-w-xs">
-                                        @if($asset->notes)
-                                            <div class="whitespace-pre-line line-clamp-3 text-xs leading-relaxed text-gray-600">{{ $asset->notes }}</div>
-                                        @else
-                                            <span class="text-gray-400 italic">-</span>
-                                        @endif
-                                    </td>
                                     <td class="px-5 py-4 text-center">
                                         @php
                                             $statusName = isset($statuses[$asset->status]) ? $statuses[$asset->status]->name : $asset->status;
@@ -94,6 +88,13 @@
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusIsActive ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800' }}">
                                             {{ $statusName }}
                                         </span>
+                                    </td>
+                                    <td class="px-5 py-4 text-sm text-gray-700 max-w-xs">
+                                        @if($asset->notes)
+                                            <div class="whitespace-pre-line line-clamp-3 text-xs leading-relaxed text-gray-600">{{ $asset->notes }}</div>
+                                        @else
+                                            <span class="text-gray-400 italic">-</span>
+                                        @endif
                                     </td>
                                     <td class="px-5 py-4 text-right">
                                         <div class="flex items-center justify-end gap-1.5">

@@ -162,10 +162,10 @@ class WorkUnitAssetController extends Controller
         ];
 
         $columns = [
-            'Kode Aset',
-            'Nama Aset',
+            'Nomor BAPBS/BAPBSAT',
             'Unit Kerja',
             'Lokasi',
+            'Penugasan Unit Kerja',
             'Status',
             'Keterangan'
         ];
@@ -189,10 +189,10 @@ class WorkUnitAssetController extends Controller
                 $statusName = isset($statuses[$asset->status]) ? $statuses[$asset->status]->name : $asset->status;
                 
                 $row = [
-                    $asset->code,
+                    '="' . $asset->code . '"', // Force Excel to treat as string to keep leading zeros
                     $asset->name,
-                    $workUnitName,
                     $asset->location->name ?? '-',
+                    $workUnitName,
                     $statusName,
                     $asset->notes ?? '-'
                 ];
