@@ -60,7 +60,19 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
+                // Auto-detect SSL CA path: supports Vercel (Amazon Linux), Ubuntu, and local dev
+                (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => (function () {
+                    if (env('MYSQL_ATTR_SSL_CA')) return env('MYSQL_ATTR_SSL_CA');
+                    $paths = [
+                        '/etc/ssl/certs/ca-bundle.crt',           // Amazon Linux (Vercel)
+                        '/etc/ssl/certs/ca-certificates.crt',     // Ubuntu/Debian
+                        '/etc/pki/tls/certs/ca-bundle.crt',       // CentOS/RHEL
+                    ];
+                    foreach ($paths as $path) {
+                        if (file_exists($path)) return $path;
+                    }
+                    return null;
+                })(),
             ]) : [],
         ],
 
