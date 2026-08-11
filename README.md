@@ -1,16 +1,19 @@
 <div align="center">
-# SIAP
-**Integrated Asset & Maintenance Management System**
 
-> Sistem manajemen aset dan tiket keluhan berbasis web untuk lingkungan korporat — dikembangkan untuk **PT Pupuk Kaltim - Departemen Administrasi Korporat (AdKor)**.
+# SIAP
+**Sistem Informasi Aset & Pelayanan**
+
+> Aplikasi web manajemen aset dan tiket keluhan berbasis web untuk lingkungan korporat — dikembangkan untuk **PT Pupuk Kaltim - Departemen Administrasi Korporat (AdKor)**.
 
 [![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?logo=laravel&logoColor=white)](https://laravel.com/)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![TiDB Cloud](https://img.shields.io/badge/TiDB_Cloud-Serverless-EF4444?logo=tidb&logoColor=white)](https://tidbcloud.com/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Vite](https://img.shields.io/badge/Vite-7.x-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Docker](https://img.shields.io/badge/Docker-MinIO-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
-[![MinIO](https://img.shields.io/badge/MinIO-Object_Storage-C72C48?logo=minio&logoColor=white)](https://min.io/)
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-Storage-3448C5?logo=cloudinary&logoColor=white)](https://cloudinary.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?logo=vercel&logoColor=white)](https://vercel.com/)
+
+🌐 **Live Demo:** [asset-ops-web.vercel.app](https://asset-ops-web.vercel.app)
 
 </div>
 
@@ -31,22 +34,29 @@
 | Fitur | Keterangan |
 |---|---|
 | 🔐 Autentikasi & Role | Login dengan 3 peran: Admin, Operator, Karyawan |
-| 🗃️ Manajemen Aset | Admin dapat menambah, mengedit, dan menetapkan aset ke karyawan |
+| 🗃️ Manajemen Aset | Admin menambah, mengedit, dan menetapkan aset ke karyawan |
 | 📋 Aset Saya | Karyawan dapat mengklaim dan melihat daftar aset yang digunakan |
-| 🎫 Sistem Tiket | Karyawan dapat melaporkan kerusakan dengan foto (upload atau kamera langsung) |
+| 🎫 Sistem Tiket | Karyawan melaporkan kerusakan dengan foto (upload atau kamera langsung) |
 | 📸 Kamera Real-time | Form laporan mendukung pengambilan foto langsung dari kamera HP/webcam |
-| ✅ Alur Persetujuan | Admin menyetujui → Operator ditugaskan → Selesai → Ditutup Karyawan |
-| 🚫 Filter Operator | Tiket yang dibatalkan/ditolak tidak tampil di layar Operator |
+| ✅ Alur Persetujuan | Admin setujui → Operator ditugaskan → Selesai → Ditutup Karyawan |
+| 🗂️ Tab Status Tiket | Tiket dikelompokkan: Semua, Menunggu, Diproses, Selesai, Batal |
+| 🔍 Pencarian Tiket | Fitur pencarian global di semua halaman tiket |
 | 📊 Dashboard | Ringkasan status tiket per peran masing-masing |
+| 📄 Ekspor PDF | Admin dapat mengekspor laporan aset & tiket ke PDF |
+| ☁️ Upload Foto Cloud | Foto tiket disimpan di Cloudinary (production) |
 
 ---
 
 ## 🏗️ Arsitektur Sistem
 
-Proyek ini menggunakan arsitektur **Laravel Monolitik** (Full-Stack Framework):
-
 ```
 Browser / HP
+    │
+    ▼
+Vercel (vercel-php@0.6.2 / PHP 8.2)
+    │
+    ▼
+api/index.php  →  public/index.php
     │
     ▼
 Routes (routes/web.php)
@@ -55,7 +65,7 @@ Routes (routes/web.php)
 Controllers (app/Http/Controllers/)
     │
     ▼
-Models (app/Models/) ←——→ Database MySQL
+Models (app/Models/) ←——→ TiDB Cloud (MySQL-compatible)
     │
     ▼
 Views / Blade Templates (resources/views/)
@@ -65,12 +75,17 @@ Browser menampilkan halaman
 ```
 
 **Stack Teknologi:**
-- **Backend:** PHP 8.2 + Laravel 12
-- **Frontend:** Blade Templates + TailwindCSS + Alpine.js
-- **Database:** MySQL 8.0 (via XAMPP)
-- **Penyimpanan Foto:** MinIO (S3-compatible Object Storage via Docker)
-- **Build Tool:** Vite 7
-- **Auth & Permission:** Laravel Breeze + Spatie Laravel-Permission
+
+| Layer | Teknologi | Catatan |
+|---|---|---|
+| Backend | PHP 8.2 + Laravel 12 | Framework utama |
+| Frontend | Blade + TailwindCSS + Alpine.js | Rendering server-side |
+| Database (Production) | TiDB Cloud Serverless | MySQL-compatible, gratis |
+| Database (Localhost) | MySQL via XAMPP | Development lokal |
+| Penyimpanan Foto | Cloudinary | Upload foto tiket |
+| Hosting | Vercel (vercel-php@0.6.2) | Serverless PHP |
+| Auth & Permission | Laravel Breeze + Spatie Permission | RBAC |
+| Build Tool | Vite 7 | Bundling CSS/JS |
 
 ---
 
@@ -78,192 +93,39 @@ Browser menampilkan halaman
 
 ```
 assetops/
+├── api/
+│   └── index.php               # Entry point Vercel (bridge ke Laravel)
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/        # Logika bisnis tiap fitur
-│   │   └── Middleware/         # Middleware (autentikasi, role)
+│   │   └── Requests/           # Form Request & validasi
 │   ├── Models/                 # Model Eloquent (Asset, Ticket, User, dll.)
 │   ├── Policies/               # Otorisasi berbasis kebijakan
 │   └── Services/               # Service class (TicketStateMachine)
+├── config/
+│   ├── database.php            # Konfigurasi database + SSL TiDB
+│   └── filesystems.php         # Konfigurasi Cloudinary storage
 ├── database/
 │   ├── migrations/             # Skema tabel database
 │   └── seeders/                # Data awal (roles, permissions, user admin)
+├── public/
+│   ├── build/                  # Hasil build Vite (CSS/JS — di-commit untuk Vercel)
+│   └── index.php               # Entry point Laravel
 ├── resources/
 │   ├── views/
 │   │   ├── admin/              # Halaman Admin
 │   │   ├── tickets/            # Halaman Tiket (buat, lihat, daftar)
 │   │   ├── user/               # Dashboard Karyawan
-│   │   ├── layouts/            # Template dasar (app.blade.php, guest.blade.php)
+│   │   ├── layouts/            # Template dasar
 │   │   └── components/         # Komponen reusable (sidebar, navbar, dll.)
 │   └── css/                    # File CSS utama
 ├── routes/
 │   ├── web.php                 # Definisi semua rute web
 │   └── auth.php                # Rute autentikasi
-├── docker-compose.yml          # Konfigurasi Docker untuk MinIO
-├── jalankan.bat                # Skrip untuk menjalankan aplikasi (Windows)
-├── hentikan.bat                # Skrip untuk menghentikan semua server (Windows)
-└── .env                        # Konfigurasi lingkungan (tidak di-commit ke Git)
+├── vercel.json                 # Konfigurasi deployment Vercel
+├── .env                        # Konfigurasi lingkungan (tidak di-commit ke Git)
+└── .env.example                # Template konfigurasi lingkungan
 ```
-
----
-
-## 🚀 Cara Menjalankan (Development — Windows + XAMPP)
-
-### Prasyarat
-
-Pastikan sudah terinstall:
-- [XAMPP](https://www.apachefriends.org/) (dengan MySQL aktif)
-- [PHP 8.2+](https://www.php.net/downloads)
-- [Composer](https://getcomposer.org/)
-- [Node.js 18+](https://nodejs.org/) & NPM
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (untuk MinIO — penyimpanan foto)
-
----
-
-### 🐳 Menjalankan MinIO (Penyimpanan Foto) via Docker
-
-Aplikasi ini menggunakan **MinIO** sebagai object storage kompatibel S3 untuk menyimpan semua foto laporan dan bukti penyelesaian tiket. MinIO dijalankan menggunakan **Docker**.
-
-**1. Pastikan Docker Desktop sudah aktif/berjalan.**
-
-**2. Jalankan MinIO container:**
-```bash
-docker-compose up -d
-```
-
-Perintah ini akan otomatis:
-- Menjalankan MinIO server di port `9000` (API) dan `9001` (Web Console)
-- Membuat bucket `assetops-bucket` secara otomatis
-- Mengatur bucket agar bisa diakses publik
-
-**3. Verifikasi MinIO berjalan:**
-
-Buka browser dan akses MinIO Web Console:
-```
-http://localhost:9001
-```
-| Field | Value |
-|---|---|
-| Username | `minioadmin` |
-| Password | `minioadmin123` |
-
-**4. Konfigurasi `.env` untuk MinIO** (sudah terkonfigurasi secara default):
-```env
-FILESYSTEM_DISK=s3
-AWS_ACCESS_KEY_ID=minioadmin
-AWS_SECRET_ACCESS_KEY=minioadmin123
-AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=assetops-bucket
-AWS_USE_PATH_STYLE_ENDPOINT=true
-AWS_ENDPOINT=http://127.0.0.1:9000
-```
-
-> ⚠️ **Penting:** MinIO **harus aktif** sebelum menjalankan aplikasi, jika tidak foto tiket tidak akan dapat diunggah maupun ditampilkan.
-
-**Untuk menghentikan MinIO:**
-```bash
-docker-compose down
-```
-
----
-
----
-
-### Langkah Instalasi
-
-**1. Clone repository**
-```bash
-git clone https://github.com/username/assetops.git
-cd assetops
-```
-
-**2. Install dependensi PHP**
-```bash
-composer install
-```
-
-**3. Install dependensi JavaScript**
-```bash
-npm install
-```
-
-**4. Salin file konfigurasi**
-```bash
-copy .env.example .env
-```
-
-**5. Generate application key**
-```bash
-php artisan key:generate
-```
-
-**6. Konfigurasi database**
-
-Edit file `.env`, sesuaikan bagian berikut:
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=assetops
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-**7. Buat database di phpMyAdmin**
-
-Buka `http://localhost/phpmyadmin` dan buat database baru bernama `assetops`.
-
-**8. Jalankan migrasi & seeder**
-```bash
-php artisan migrate --seed
-```
-
-**9. Buat symbolic link untuk storage foto**
-```bash
-php artisan storage:link
-```
-
-**10. Build aset CSS/JS**
-```bash
-npm run build
-```
-
----
-
-### Menjalankan Aplikasi
-
-**Cara cepat (disarankan):** Klik dua kali file `jalankan.bat` atau jalankan di terminal sebagai Administrator:
-```bash
-.\jalankan.bat
-```
-
-Aplikasi akan otomatis terbuka di `http://localhost:8000`
-
-**Cara manual:**
-```bash
-# Terminal 1 - Server Laravel
-php artisan serve
-
-# Terminal 2 - Vite (Development)
-npm run dev
-```
-
-**Untuk menghentikan:**
-```bash
-.\hentikan.bat
-```
-
----
-
-## 👤 Akun Default (Setelah Seeding)
-
-| Role | Email | Password |
-|---|---|---|
-| Admin | admin@assetops.com | password |
-| Operator | operator@assetops.com | password |
-| Karyawan | user@assetops.com | password |
-
-> ⚠️ **Penting:** Segera ganti password setelah pertama kali login di lingkungan produksi!
 
 ---
 
@@ -296,7 +158,7 @@ Karyawan Buat Tiket
     [closed] ✅
 ```
 
-Karyawan juga dapat **membatalkan** tiket selama masih dalam status `waiting_approval`.
+> Karyawan juga dapat **membatalkan** tiket selama masih dalam status `waiting_approval`.
 
 ---
 
@@ -312,105 +174,257 @@ Karyawan juga dapat **membatalkan** tiket selama masih dalam status `waiting_app
 | Klaim & lihat Aset Saya | ❌ | ❌ | ✅ |
 | Tutup tiket (konfirmasi selesai) | ❌ | ❌ | ✅ |
 | Manajemen Pengguna | ✅ | ❌ | ❌ |
+| Ekspor PDF | ✅ | ❌ | ❌ |
 
-> *Operator tidak melihat tiket yang berstatus `rejected` atau `cancelled`.
+> *Operator tidak melihat tiket berstatus `rejected` atau `cancelled`.
 
 ---
 
-## 🚀 Cara Instalasi di Komputer Lokal (Untuk Anggota Tim)
+## 👤 Akun Default (Setelah Seeding)
 
-Jika Anda (atau teman Anda) ingin menjalankan dan ikut mengedit project ini di laptop masing-masing, ikuti langkah-langkah berikut:
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@siap.com | password |
+| Operator | operator@siap.com | password |
+| Karyawan | user@siap.com | password |
 
-### 🧰 Persiapan & Instalasi Software Pendukung
-Sebelum men-download project ini, pastikan laptop Anda sudah terinstal aplikasi berikut:
+> ⚠️ **Penting:** Segera ganti password setelah pertama kali login di lingkungan produksi!
 
-1. **Git** (Untuk mendownload kode dari GitHub)
-   * Download di: [git-scm.com/downloads](https://git-scm.com/downloads)
-   * Cara install: Download file `.exe`, klik 2x, lalu tekan *Next* terus sampai selesai.
-2. **XAMPP** (Menyediakan PHP dan MySQL Server)
-   * Download di: [apachefriends.org](https://www.apachefriends.org/download.html)
-   * **Penting:** Pastikan Anda men-download versi XAMPP yang mendukung **PHP 8.2** atau yang lebih baru.
-   * Cara install: Install seperti biasa (tekan *Next*). Setelah selesai, buka XAMPP Control Panel lalu klik **Start** pada modul `Apache` dan `MySQL`.
-3. **Composer** (Untuk menginstal library Laravel)
-   * Download di: [getcomposer.org](https://getcomposer.org/download/)
-   * Cara install: Download `Composer-Setup.exe`, klik 2x, tekan *Next* sampai selesai.
-4. **Node.js** (Untuk mengolah desain TailwindCSS/Vite)
-   * Download di: [nodejs.org](https://nodejs.org/en/)
-   * Pilih versi **LTS** (Long Term Support).
-   * Cara install: Install seperti biasa (*Next* sampai selesai).
-5. **Visual Studio Code** (Aplikasi Kode Editor)
-   * Download di: [code.visualstudio.com](https://code.visualstudio.com/)
+---
 
-*(Catatan: Jika Anda baru saja menginstal software di atas, pastikan Anda merestart / menutup dan membuka ulang VS Code dan Terminal Anda agar software yang baru diinstal bisa terbaca oleh sistem).*
+## 🌐 Deployment ke Vercel (Production)
 
-### 🛠️ Langkah-langkah Menjalankan Project
-1. **Clone Repository (Download Kode)**
-   Buka terminal/CMD, lalu ketik perintah berikut:
-   ```bash
-   git clone https://github.com/andann15/AssetOps-web.git
-   cd AssetOps-web
-   ```
+### Prasyarat
 
-2. **Install Dependensi PHP (Library Laravel)**
-   ```bash
-   composer install
-   ```
+- Akun [Vercel](https://vercel.com) (gratis)
+- Akun [TiDB Cloud](https://tidbcloud.com) (gratis, untuk database)
+- Akun [Cloudinary](https://cloudinary.com) (gratis, untuk penyimpanan foto)
+- Repository sudah di-push ke GitHub
 
-3. **Install Dependensi Desain (Tailwind/Vite)**
-   ```bash
-   npm install
-   ```
+### Langkah Deployment
 
-4. **Siapkan File Konfigurasi (.env)**
-   * Copy/duplikat file `.env.example` dan ubah namanya menjadi `.env`.
-   * Buka terminal dan buat kunci rahasia aplikasi:
-     ```bash
-     php artisan key:generate
-     ```
+**1. Fork / Push repository ke GitHub**
 
-5. **Hubungkan Database MySQL**
-   * Nyalakan module **MySQL** di aplikasi XAMPP Anda.
-   * Buka browser dan pergi ke `http://localhost/phpmyadmin`.
-   * Buat database kosong baru dengan nama `assetops`.
-   * Buka file `.env` di VS Code, lalu pastikan konfigurasinya seperti ini:
-     ```env
-     DB_CONNECTION=mysql
-     DB_HOST=127.0.0.1
-     DB_PORT=3306
-     DB_DATABASE=assetops
-     DB_USERNAME=root
-     DB_PASSWORD=
-     ```
+**2. Import project ke Vercel**
+- Buka [vercel.com/new](https://vercel.com/new)
+- Klik **Import** pada repository Anda
+- Framework Preset biarkan **Other**
 
-6. **Migrasi Tabel (Membuat Struktur Database)**
-   ```bash
-   php artisan migrate
-   ```
-   *(Opsional: Jika ada data dummy/seeder, Anda bisa menjalankan `php artisan migrate --seed`)*
+**3. Siapkan TiDB Cloud Database**
+- Daftar di [tidbcloud.com](https://tidbcloud.com)
+- Buat cluster **Serverless** (gratis)
+- Buka tab **Connect** dan catat kredensial koneksi
 
-7. **Jalankan Aplikasi**
-   Anda membutuhkan dua terminal yang menyala bersamaan di VS Code:
-   
-   **Terminal 1 (Menjalankan Web Server/Laravel):**
-   ```bash
-   php artisan serve
-   ```
-   **Terminal 2 (Menjalankan Desain CSS):**
-   ```bash
-   npm run dev
-   ```
+**4. Siapkan Cloudinary**
+- Daftar di [cloudinary.com](https://cloudinary.com)
+- Dari Dashboard, catat: **Cloud Name**, **API Key**, **API Secret**
 
-8. **Selesai!** 🎉
-   Buka browser Anda dan akses aplikasi di: **`http://127.0.0.1:8000`**
+**5. Konfigurasi Environment Variables di Vercel**
+
+Buka **Settings → Environment Variables** di project Vercel Anda, lalu tambahkan:
+
+| Key | Value | Keterangan |
+|---|---|---|
+| `APP_NAME` | `SIAP` | Nama aplikasi |
+| `APP_ENV` | `production` | Mode produksi |
+| `APP_KEY` | `base64:...` | Generate dengan `php artisan key:generate` |
+| `APP_DEBUG` | `false` | Nonaktifkan debug di produksi |
+| `APP_URL` | `https://your-app.vercel.app` | URL aplikasi Anda |
+| `DB_CONNECTION` | `mysql` | Driver database |
+| `DB_HOST` | `gateway01.ap-southeast-1.prod.aws.tidbcloud.com` | Host TiDB Cloud |
+| `DB_PORT` | `4000` | Port TiDB Cloud |
+| `DB_DATABASE` | `nama_database` | Nama database di TiDB |
+| `DB_USERNAME` | `username.root` | Username TiDB |
+| `DB_PASSWORD` | `password` | Password TiDB |
+| `CLOUDINARY_CLOUD_NAME` | `your_cloud_name` | Dari Cloudinary Dashboard |
+| `CLOUDINARY_API_KEY` | `your_api_key` | Dari Cloudinary Dashboard |
+| `CLOUDINARY_API_SECRET` | `your_api_secret` | Dari Cloudinary Dashboard |
+| `SESSION_DRIVER` | `cookie` | Session berbasis cookie (Vercel stateless) |
+| `CACHE_STORE` | `array` | Cache di memory (Vercel stateless) |
+| `FILESYSTEM_DISK` | `cloudinary` | Gunakan Cloudinary untuk upload |
+
+> ⚠️ **Jangan** gunakan `CLOUDINARY_URL` — Vercel akan mengubah format URL-nya. Gunakan 3 variabel terpisah di atas.
+
+**6. Deploy**
+- Klik **Deploy** dan tunggu proses selesai (~2-3 menit)
+- Setelah selesai, jalankan migrasi database melalui Vercel CLI atau melalui localhost:
+
+```bash
+# Jalankan migration dari lokal dengan env production
+php artisan migrate --env=production
+# atau
+php artisan migrate
+```
+
+**7. Verifikasi**
+- Buka URL Vercel Anda
+- Coba login dengan akun default
+
+### Catatan Teknis Vercel
+
+| Hal | Detail |
+|---|---|
+| PHP Runtime | `vercel-php@0.6.2` (PHP 8.2) |
+| Entry Point | `api/index.php` |
+| Cache Dir | `/tmp/bootstrap/cache` (auto-generated saat runtime) |
+| File Upload | Tidak bisa simpan ke disk lokal — **wajib** gunakan Cloudinary |
+| Session | Harus menggunakan `cookie` atau database driver |
+
+---
+
+## 💻 Menjalankan di Localhost (Development)
+
+### Prasyarat
+
+Pastikan sudah terinstall:
+- [XAMPP](https://www.apachefriends.org/) v8.2+ (dengan MySQL aktif)
+- [Composer](https://getcomposer.org/)
+- [Node.js 18+](https://nodejs.org/) & NPM
+
+### Langkah Instalasi
+
+**1. Clone repository**
+```bash
+git clone https://github.com/andann15/AssetOps-web.git
+cd AssetOps-web
+```
+
+**2. Install dependensi PHP**
+```bash
+composer install
+```
+
+**3. Install dependensi JavaScript**
+```bash
+npm install
+```
+
+**4. Salin file konfigurasi**
+```bash
+# Windows
+copy .env.example .env
+
+# Mac/Linux
+cp .env.example .env
+```
+
+**5. Generate application key**
+```bash
+php artisan key:generate
+```
+
+**6. Konfigurasi database di `.env`**
+
+Edit file `.env`, sesuaikan bagian berikut:
+```env
+APP_NAME=SIAP
+APP_ENV=local
+APP_KEY=        # Diisi otomatis oleh key:generate
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=assetops
+DB_USERNAME=root
+DB_PASSWORD=
+
+SESSION_DRIVER=file
+CACHE_STORE=file
+FILESYSTEM_DISK=local
+```
+
+**7. Buat database di phpMyAdmin**
+- Nyalakan **Apache** dan **MySQL** di XAMPP Control Panel
+- Buka `http://localhost/phpmyadmin`
+- Buat database baru bernama `assetops`
+
+**8. Jalankan migrasi & seeder**
+```bash
+php artisan migrate --seed
+```
+
+**9. Jalankan aplikasi**
+
+Buka **dua terminal** secara bersamaan:
+
+```bash
+# Terminal 1 — Laravel Development Server
+php artisan serve
+```
+
+```bash
+# Terminal 2 — Vite (Hot Reload CSS/JS)
+npm run dev
+```
+
+**10. Buka di browser**
+
+```
+http://127.0.0.1:8000
+```
+
+---
+
+### Upload Foto di Localhost
+
+Secara default di localhost, foto akan disimpan di folder `storage/app/public/`. Pastikan sudah menjalankan:
+
+```bash
+php artisan storage:link
+```
+
+Jika ingin menggunakan Cloudinary juga di localhost, tambahkan ke `.env`:
+```env
+FILESYSTEM_DISK=cloudinary
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+---
+
+## 🔧 Perintah Artisan yang Sering Digunakan
+
+```bash
+# Jalankan migrasi ulang dari awal (HAPUS semua data!)
+php artisan migrate:fresh --seed
+
+# Bersihkan cache
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
+
+# Lihat semua rute
+php artisan route:list
+
+# Buat symbolic link storage
+php artisan storage:link
+```
+
+---
+
+## ❓ Troubleshooting
+
+| Masalah | Solusi |
+|---|---|
+| `Class not found` setelah pull | Jalankan `composer dump-autoload` |
+| Halaman blank / error 500 | Cek file `.env` sudah ada & `APP_KEY` sudah diisi |
+| CSS tidak ter-update | Jalankan `npm run dev` atau `npm run build` |
+| Upload foto gagal | Pastikan `storage:link` sudah dijalankan (localhost) atau env Cloudinary sudah diisi (production) |
+| Vercel: `FUNCTION_INVOCATION_FAILED` | Pastikan menggunakan `vercel-php@0.6.2` di `vercel.json`, bukan versi lebih baru |
+| Database error di Vercel | Pastikan tidak menggunakan InfinityFree — gunakan TiDB Cloud |
 
 ---
 
 ## 📄 Lisensi
 
-Proyek ini dikembangkan secara internal untuk keperluan **PT Pupuk Kaltim - Departemen AdKor**. Seluruh hak cipta dilindungi.
+Proyek ini dikembangkan secara internal untuk keperluan **PT Pupuk Kaltim - Departemen Administrasi Korporat (AdKor)**. Seluruh hak cipta dilindungi.
 
 ---
 
 <div align="center">
-  <sub>Dibangun dengan ❤️ menggunakan Laravel 12 & TailwindCSS</sub>
+  <sub>Dibangun dengan ❤️ menggunakan Laravel 12, TailwindCSS, Vercel & TiDB Cloud</sub>
 </div>
