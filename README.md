@@ -285,11 +285,11 @@ Pastikan sudah terinstall:
 
 **1. Clone repository**
 ```bash
-git clone https://github.com/andann15/AssetOps-web.git
-cd AssetOps-web
+git clone https://github.com/andann15/SiAP-Adkor.git
+cd SiAP-Adkor
 ```
 
-> 💡 Nama folder repository di GitHub masih `AssetOps-web` — isinya sudah merupakan aplikasi SIAP.
+> 💡 Repository ini sebelumnya bernama `AssetOps-web` dan telah dimigrasi menjadi `SiAP-Adkor`.
 
 **2. Install dependensi PHP**
 ```bash
