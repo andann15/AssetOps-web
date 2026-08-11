@@ -92,7 +92,7 @@ Browser menampilkan halaman
 ## 📁 Struktur Folder Penting
 
 ```
-assetops/
+siap/
 ├── api/
 │   └── index.php               # Entry point Vercel (bridge ke Laravel)
 ├── app/
@@ -289,6 +289,8 @@ git clone https://github.com/andann15/AssetOps-web.git
 cd AssetOps-web
 ```
 
+> 💡 Nama folder repository di GitHub masih `AssetOps-web` — isinya sudah merupakan aplikasi SIAP.
+
 **2. Install dependensi PHP**
 ```bash
 composer install
@@ -326,7 +328,7 @@ APP_URL=http://localhost:8000
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=assetops
+DB_DATABASE=siap
 DB_USERNAME=root
 DB_PASSWORD=
 
@@ -338,7 +340,7 @@ FILESYSTEM_DISK=local
 **7. Buat database di phpMyAdmin**
 - Nyalakan **Apache** dan **MySQL** di XAMPP Control Panel
 - Buka `http://localhost/phpmyadmin`
-- Buat database baru bernama `assetops`
+- Buat database baru bernama `siap`
 
 **8. Jalankan migrasi & seeder**
 ```bash
