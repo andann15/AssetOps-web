@@ -21,6 +21,11 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
-assetops_deploy.zip
+# Deployment artifacts (keep local, not in Git)
+*.zip
 zip_deploy.php
 zip_deploy.ps1
+docker-compose.override.yml
+
+# Database dumps (keep local as backup, not in Git)
+*.sql
