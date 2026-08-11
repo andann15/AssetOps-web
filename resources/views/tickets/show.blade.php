@@ -60,12 +60,12 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <p class="text-sm text-gray-500 mb-1">Foto Laporan Awal</p>
-                        <img src="{{ Storage::url($ticket->photo_url) }}" class="rounded border max-h-48">
+                        <img src="{{ $ticket->photo_url }}" class="rounded border max-h-48" alt="Foto Laporan">
                     </div>
                     @if ($ticket->proof_photo_url)
                         <div>
                             <p class="text-sm text-gray-500 mb-1">Foto Bukti Perbaikan</p>
-                            <img src="{{ Storage::url($ticket->proof_photo_url) }}" class="rounded border max-h-48">
+                            <img src="{{ $ticket->proof_photo_url }}" class="rounded border max-h-48" alt="Foto Bukti">
                         </div>
                     @endif
                 </div>

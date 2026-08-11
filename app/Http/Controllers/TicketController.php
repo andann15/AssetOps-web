@@ -83,19 +83,22 @@ class TicketController extends Controller
         $this->authorize('create', Ticket::class);
 
         $validated = $request->validate([
-            'asset_id' => ['required', 'exists:assets,id'],
+            'asset_id'    => ['required', 'exists:assets,id'],
             'description' => ['required', 'string', 'max:2000'],
-            'photo' => ['required', 'image', 'mimes:jpeg,png,jpg,webp,heic', 'max:4096'],
+            'photo'       => ['required', 'image', 'mimes:jpeg,png,jpg,webp,heic', 'max:4096'],
         ]);
 
-        $path = $request->file('photo')->store('tickets/reports', 'public');
+        $uploadResult = cloudinary()->upload($request->file('photo')->getRealPath(), [
+            'folder' => 'siap/tickets/reports',
+        ]);
+        $photoUrl = $uploadResult->getSecurePath();
 
         $ticket = new Ticket([
-            'asset_id' => $validated['asset_id'],
-            'created_by' => $request->user()->id,
+            'asset_id'    => $validated['asset_id'],
+            'created_by'  => $request->user()->id,
             'description' => $validated['description'],
-            'photo_url' => $path,
-            'status' => 'waiting_approval',
+            'photo_url'   => $photoUrl,
+            'status'      => 'waiting_approval',
         ]);
 
         $ticket->ticket_number = $this->generateTicketNumber();
@@ -160,10 +163,13 @@ class TicketController extends Controller
             'proof_photo' => ['required', 'image', 'mimes:jpeg,png,jpg,webp,heic', 'max:4096'],
         ]);
 
-        $path = $request->file('proof_photo')->store('tickets/proofs', 'public');
+        $uploadResult = cloudinary()->upload($request->file('proof_photo')->getRealPath(), [
+            'folder' => 'siap/tickets/proofs',
+        ]);
+        $proofUrl = $uploadResult->getSecurePath();
 
         $this->stateMachine->transitionTo($ticket, 'completed', $request->user(), [
-            'proof_photo_url' => $path,
+            'proof_photo_url' => $proofUrl,
         ]);
 
         return back()->with('success', 'Tiket ditandai selesai dikerjakan.');
