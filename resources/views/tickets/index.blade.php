@@ -34,17 +34,10 @@
 
             <x-ui.card :padded="false">
                 <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                    <form method="GET" action="{{ route('tickets.index') }}" class="flex items-center gap-2">
+                    <form id="search-form" method="GET" action="{{ route('tickets.index') }}" class="flex items-center gap-2">
                         <input type="hidden" name="tab" value="{{ request('tab', 'all') }}">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            </div>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari no tiket, pembuat, atau aset..." class="pl-10 rounded-lg border-gray-200 text-sm focus:ring-brand focus:border-brand w-72">
-                        </div>
-                        <button type="submit" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors">Cari</button>
-                        @if(request('search'))
-                            <a href="{{ route('tickets.index') }}" class="px-3 py-2 text-gray-500 hover:text-gray-700 text-sm">Reset</a>
+                        @if(request('search_ticket') || request('search_creator') || request('search_desc') || request('search_priority'))
+                            <a href="{{ route('tickets.index', ['tab' => request('tab', 'all')]) }}" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-xs font-medium transition-colors">Reset Filter</a>
                         @endif
                     </form>
                     <p class="text-xs text-gray-400">{{ $tickets->total() }} tiket ditemukan</p>
@@ -61,7 +54,7 @@
                         ];
                     @endphp
                     @foreach($tabs as $key => $label)
-                        <a href="{{ route('tickets.index', ['tab' => $key, 'search' => request('search')]) }}" 
+                        <a href="{{ route('tickets.index', ['tab' => $key, 'search_ticket' => request('search_ticket'), 'search_creator' => request('search_creator'), 'search_desc' => request('search_desc'), 'search_priority' => request('search_priority')]) }}" 
                            class="whitespace-nowrap px-6 py-3.5 font-medium text-sm transition-colors duration-200 border-b-2 {{ $activeTab === $key ? 'border-brand text-brand' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                             {{ $label }} ({{ $counts[$key] ?? 0 }})
                         </a>
@@ -78,6 +71,29 @@
                                 <th class="px-5 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Prioritas</th>
                                 <th class="px-5 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
                                 <th class="px-5 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                            <tr class="bg-gray-50 border-t border-gray-100">
+                                <th class="px-2 py-2">
+                                    <input type="text" name="search_ticket" form="search-form" value="{{ request('search_ticket') }}" placeholder="Cari tiket/aset..." class="w-full text-xs rounded border-gray-200 focus:ring-brand focus:border-brand py-1.5 px-2 font-normal">
+                                </th>
+                                <th class="px-2 py-2">
+                                    <input type="text" name="search_creator" form="search-form" value="{{ request('search_creator') }}" placeholder="Cari pembuat..." class="w-full text-xs rounded border-gray-200 focus:ring-brand focus:border-brand py-1.5 px-2 font-normal">
+                                </th>
+                                <th class="px-2 py-2">
+                                    <input type="text" name="search_desc" form="search-form" value="{{ request('search_desc') }}" placeholder="Cari deskripsi..." class="w-full text-xs rounded border-gray-200 focus:ring-brand focus:border-brand py-1.5 px-2 font-normal">
+                                </th>
+                                <th class="px-2 py-2">
+                                    <input type="text" name="search_priority" form="search-form" value="{{ request('search_priority') }}" placeholder="Cari..." class="w-full text-xs rounded border-gray-200 focus:ring-brand focus:border-brand py-1.5 px-2 text-center font-normal">
+                                </th>
+                                <th class="px-2 py-2 text-center">
+                                    <!-- Status filter handled by tabs -->
+                                </th>
+                                <th class="px-2 py-2 text-right">
+                                    <button type="submit" form="search-form" class="inline-flex items-center gap-1 text-xs bg-brand text-sidebar hover:bg-brand/90 px-3 py-1.5 rounded font-medium shadow-sm transition-colors">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                        Filter
+                                    </button>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 bg-white">

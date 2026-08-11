@@ -35,17 +35,33 @@ class TicketController extends Controller
             $baseQuery->where('created_by', $request->user()->id);
         }
 
-        if ($request->filled('search')) {
-            $search = $request->search;
+        if ($request->filled('search_ticket')) {
+            $search = $request->search_ticket;
             $baseQuery->where(function ($q) use ($search) {
                 $q->where('ticket_number', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
                   ->orWhereHas('asset', function ($q) use ($search) {
                       $q->where('name', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('creator', function ($q) use ($search) {
+                  });
+            });
+        }
+
+        if ($request->filled('search_creator')) {
+            $search = $request->search_creator;
+            $baseQuery->whereHas('creator', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhereHas('workUnit', function ($q) use ($search) {
                       $q->where('name', 'like', "%{$search}%");
                   });
+            });
+        }
+
+        if ($request->filled('search_desc')) {
+            $baseQuery->where('description', 'like', "%{$request->search_desc}%");
+        }
+
+        if ($request->filled('search_priority')) {
+            $baseQuery->whereHas('priority', function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search_priority}%");
             });
         }
 
