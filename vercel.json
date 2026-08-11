@@ -7,11 +7,19 @@
       "use": "vercel-php@0.7.2"
     },
     {
+      "src": "api/debug.php",
+      "use": "vercel-php@0.7.2"
+    },
+    {
       "src": "public/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
+    {
+      "src": "/_debug",
+      "dest": "/api/debug.php"
+    },
     {
       "src": "/(.*)",
       "dest": "/api/index.php"

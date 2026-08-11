@@ -1,17 +1,37 @@
 <?php
-// Debug file - DELETE AFTER TESTING
-echo "<h1>PHP is working!</h1>";
-echo "<p>PHP Version: " . phpversion() . "</p>";
-echo "<p>Time: " . date('Y-m-d H:i:s') . "</p>";
+// Minimal debug - no Laravel, no dependencies
+// Access: https://your-vercel-url.vercel.app/api/debug.php
 
-$root = dirname(__DIR__);
-echo "<p>Root path: " . $root . "</p>";
-echo "<p>Vendor exists: " . (is_dir($root . '/vendor') ? 'YES' : 'NO') . "</p>";
-echo "<p>Bootstrap/app.php exists: " . (file_exists($root . '/bootstrap/app.php') ? 'YES' : 'NO') . "</p>";
-echo "<p>/tmp writable: " . (is_writable('/tmp') ? 'YES' : 'NO') . "</p>";
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Check env vars
-echo "<h2>Key ENV Variables:</h2>";
-echo "<p>APP_KEY set: " . (getenv('APP_KEY') ? 'YES' : 'NO') . "</p>";
-echo "<p>DB_HOST: " . (getenv('DB_HOST') ?: 'NOT SET') . "</p>";
-echo "<p>APP_ENV: " . (getenv('APP_ENV') ?: 'NOT SET') . "</p>";
+header('Content-Type: text/plain');
+
+echo "PHP Version: " . PHP_VERSION . "\n";
+echo "PHP Loaded Extensions:\n";
+foreach (get_loaded_extensions() as $ext) {
+    echo "  - $ext\n";
+}
+
+echo "\nEnvironment Variables:\n";
+$safe_keys = ['APP_ENV', 'APP_DEBUG', 'APP_KEY', 'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME'];
+foreach ($safe_keys as $key) {
+    $val = getenv($key) ?: ($_ENV[$key] ?? 'NOT SET');
+    if ($key === 'APP_KEY' && strlen($val) > 10) {
+        $val = substr($val, 0, 10) . '...(hidden)';
+    }
+    if ($key === 'DB_PASSWORD') {
+        $val = '(hidden)';
+    }
+    echo "  $key = $val\n";
+}
+
+echo "\nWrite access to /tmp: " . (is_writable('/tmp') ? 'YES' : 'NO') . "\n";
+
+$tmpDir = '/tmp/bootstrap/cache';
+if (!is_dir($tmpDir)) {
+    mkdir($tmpDir, 0775, true);
+}
+echo "Can create /tmp/bootstrap/cache: " . (is_dir($tmpDir) ? 'YES' : 'NO') . "\n";
+
+echo "\nDone!";
