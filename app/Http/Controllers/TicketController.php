@@ -35,49 +35,33 @@ class TicketController extends Controller
             $baseQuery->where('created_by', $request->user()->id);
         }
 
-        if ($request->filled('search_ticket')) {
-            $search = $request->search_ticket;
+        if ($request->filled('search')) {
+            $search = $request->search;
             $baseQuery->where(function ($q) use ($search) {
                 $q->where('ticket_number', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
                   ->orWhereHas('asset', function ($q) use ($search) {
                       $q->where('name', 'like', "%{$search}%");
-                  });
-            });
-        }
-
-        if ($request->filled('search_creator')) {
-            $search = $request->search_creator;
-            $baseQuery->whereHas('creator', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhereHas('workUnit', function ($q) use ($search) {
+                  })
+                  ->orWhereHas('creator', function ($q) use ($search) {
                       $q->where('name', 'like', "%{$search}%");
                   });
-            });
-        }
-
-        if ($request->filled('search_desc')) {
-            $baseQuery->where('description', 'like', "%{$request->search_desc}%");
-        }
-
-        if ($request->filled('search_priority')) {
-            $baseQuery->whereHas('priority', function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->search_priority}%");
             });
         }
 
         // Calculate counts for each tab
         $counts = [
-            'all' => $baseQuery->clone()->count(),
-            'waiting' => $baseQuery->clone()->where('status', 'waiting_approval')->count(),
+            'all'         => $baseQuery->clone()->count(),
+            'waiting'     => $baseQuery->clone()->where('status', 'waiting_approval')->count(),
             'in_progress' => $baseQuery->clone()->whereIn('status', ['assigned', 'checking'])->count(),
-            'completed' => $baseQuery->clone()->whereIn('status', ['completed', 'closed'])->count(),
-            'cancelled' => $baseQuery->clone()->whereIn('status', ['cancelled', 'rejected'])->count(),
+            'completed'   => $baseQuery->clone()->whereIn('status', ['completed', 'closed'])->count(),
+            'cancelled'   => $baseQuery->clone()->whereIn('status', ['cancelled', 'rejected'])->count(),
         ];
 
         // Apply tab filter
         $activeTab = $request->query('tab', 'all');
         $query = $baseQuery->clone();
-        
+
         switch ($activeTab) {
             case 'waiting':
                 $query->where('status', 'waiting_approval');
@@ -92,7 +76,6 @@ class TicketController extends Controller
                 $query->whereIn('status', ['cancelled', 'rejected']);
                 break;
             default:
-                // 'all' tab does not need additional filtering beyond the base query
                 break;
         }
 
