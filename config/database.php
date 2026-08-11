@@ -60,8 +60,8 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                // Auto-detect SSL CA path: supports Vercel (Amazon Linux), Ubuntu, and local dev
-                (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => (function () {
+                PDO::MYSQL_ATTR_SSL_CA => (function () {
+                    // For TiDB Cloud - use system CA bundle
                     if (env('MYSQL_ATTR_SSL_CA')) return env('MYSQL_ATTR_SSL_CA');
                     $paths = [
                         '/etc/ssl/certs/ca-bundle.crt',           // Amazon Linux (Vercel)
@@ -73,6 +73,7 @@ return [
                     }
                     return null;
                 })(),
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
             ]) : [],
         ],
 
