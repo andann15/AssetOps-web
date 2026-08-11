@@ -13,7 +13,7 @@
 [![Cloudinary](https://img.shields.io/badge/Cloudinary-Storage-3448C5?logo=cloudinary&logoColor=white)](https://cloudinary.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?logo=vercel&logoColor=white)](https://vercel.com/)
 
-🌐 **Live Demo:** [asset-ops-web.vercel.app](https://asset-ops-web.vercel.app)
+🌐 **Live Demo:** [siap-web.vercel.app](https://siap-web.vercel.app)
 
 </div>
 
@@ -229,7 +229,7 @@ Buka **Settings → Environment Variables** di project Vercel Anda, lalu tambahk
 | `APP_ENV` | `production` | Mode produksi |
 | `APP_KEY` | `base64:...` | Generate dengan `php artisan key:generate` |
 | `APP_DEBUG` | `false` | Nonaktifkan debug di produksi |
-| `APP_URL` | `https://your-app.vercel.app` | URL aplikasi Anda |
+| `APP_URL` | `https://siap-web.vercel.app` | URL aplikasi Anda |
 | `DB_CONNECTION` | `mysql` | Driver database |
 | `DB_HOST` | `gateway01.ap-southeast-1.prod.aws.tidbcloud.com` | Host TiDB Cloud |
 | `DB_PORT` | `4000` | Port TiDB Cloud |
