@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use Cloudinary\Cloudinary;
+use CloudinaryLabs\CloudinaryLaravel\CloudinaryStorageAdapter;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\ServiceProvider;
+use League\Flysystem\Filesystem;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,33 +15,31 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Safely register Cloudinary so it doesn't crash if CLOUDINARY_URL is not set
-        $this->app->singleton(\Cloudinary\Cloudinary::class, function ($app) {
+        // Safely register Cloudinary singleton — won't crash if env vars are missing
+        $this->app->singleton(Cloudinary::class, function ($app) {
             $config = $app['config']->get('filesystems.disks.cloudinary', []);
-            $url = $config['url'] ?? null;
-
-            if ($url) {
-                return new \Cloudinary\Cloudinary($url);
-            }
-
-            $cloud  = $config['cloud'] ?? null;
-            $key    = $config['key'] ?? null;
+            $cloud  = $config['cloud']  ?? null;
+            $key    = $config['key']    ?? null;
             $secret = $config['secret'] ?? null;
 
             if ($cloud && $key && $secret) {
-                return new \Cloudinary\Cloudinary([
+                return new Cloudinary([
                     'cloud' => [
                         'cloud_name' => $cloud,
                         'api_key'    => $key,
                         'api_secret' => $secret,
                     ],
-                    'url' => ['secure' => $config['secure'] ?? true],
+                    'url' => ['secure' => true],
                 ]);
             }
 
-            // Return an unconfigured Cloudinary instance — upload calls will fail
-            // gracefully instead of crashing the entire app on boot.
-            return new \Cloudinary\Cloudinary([]);
+            // No credentials — return empty instance so app boots without crashing
+            // (upload calls will fail only when actually attempted, not on boot)
+            try {
+                return new Cloudinary(null);
+            } catch (\Throwable $e) {
+                return new Cloudinary(['cloud' => ['cloud_name' => 'placeholder', 'api_key' => 'placeholder', 'api_secret' => 'placeholder']]);
+            }
         });
     }
 
@@ -49,5 +51,27 @@ class AppServiceProvider extends ServiceProvider
         if (str_contains(request()->getHost(), 'ngrok') || str_contains(request()->getHost(), 'vercel.app') || app()->environment('production')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
+
+        // Manually register Cloudinary filesystem disk (since auto-discovery is disabled)
+        $this->app['filesystem']->extend('cloudinary', function ($app, $config) {
+            $cloud  = $config['cloud']  ?? null;
+            $key    = $config['key']    ?? null;
+            $secret = $config['secret'] ?? null;
+
+            if ($cloud && $key && $secret) {
+                $cloudinary = new Cloudinary([
+                    'cloud' => [
+                        'cloud_name' => $cloud,
+                        'api_key'    => $key,
+                        'api_secret' => $secret,
+                    ],
+                    'url' => ['secure' => true],
+                ]);
+                $adapter = new CloudinaryStorageAdapter($cloudinary, null, $config['prefix'] ?? null);
+                return new FilesystemAdapter(new Filesystem($adapter, $config), $adapter, $config);
+            }
+
+            return null; // Disk not available without credentials
+        });
     }
 }
