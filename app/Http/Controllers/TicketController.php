@@ -24,20 +24,20 @@ class TicketController extends Controller
     {
         $this->authorize('viewAny', Ticket::class);
 
-        $query = Ticket::with(['asset', 'priority']);
+        $baseQuery = Ticket::with(['asset', 'priority']);
 
         if ($request->user()->can('tickets.view-all')) {
-            $query->with(['creator']);
+            $baseQuery->with(['creator']);
             if ($request->user()->hasRole('operator') && !$request->user()->hasRole('admin')) {
-                $query->whereNotIn('status', ['rejected', 'cancelled']);
+                $baseQuery->whereNotIn('status', ['rejected', 'cancelled']);
             }
         } else {
-            $query->where('created_by', $request->user()->id);
+            $baseQuery->where('created_by', $request->user()->id);
         }
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
+            $baseQuery->where(function ($q) use ($search) {
                 $q->where('ticket_number', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%")
                   ->orWhereHas('asset', function ($q) use ($search) {
@@ -49,9 +49,40 @@ class TicketController extends Controller
             });
         }
 
+        // Calculate counts for each tab
+        $counts = [
+            'all' => (clone $baseQuery)->count(),
+            'waiting' => (clone $baseQuery)->where('status', 'waiting_approval')->count(),
+            'in_progress' => (clone $baseQuery)->whereIn('status', ['assigned', 'checking'])->count(),
+            'completed' => (clone $baseQuery)->whereIn('status', ['completed', 'closed'])->count(),
+            'cancelled' => (clone $baseQuery)->whereIn('status', ['cancelled', 'rejected'])->count(),
+        ];
+
+        // Apply tab filter
+        $activeTab = $request->query('tab', 'all');
+        $query = clone $baseQuery;
+        
+        switch ($activeTab) {
+            case 'waiting':
+                $query->where('status', 'waiting_approval');
+                break;
+            case 'in_progress':
+                $query->whereIn('status', ['assigned', 'checking']);
+                break;
+            case 'completed':
+                $query->whereIn('status', ['completed', 'closed']);
+                break;
+            case 'cancelled':
+                $query->whereIn('status', ['cancelled', 'rejected']);
+                break;
+            default:
+                // 'all' tab does not need additional filtering beyond the base query
+                break;
+        }
+
         $tickets = $query->latest()->paginate(15)->withQueryString();
 
-        return view('tickets.index', compact('tickets'));
+        return view('tickets.index', compact('tickets', 'counts', 'activeTab'));
     }
 
     public function create(Request $request): View

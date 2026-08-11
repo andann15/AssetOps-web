@@ -35,6 +35,7 @@
             <x-ui.card :padded="false">
                 <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                     <form method="GET" action="{{ route('tickets.index') }}" class="flex items-center gap-2">
+                        <input type="hidden" name="tab" value="{{ request('tab', 'all') }}">
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -47,6 +48,24 @@
                         @endif
                     </form>
                     <p class="text-xs text-gray-400">{{ $tickets->total() }} tiket ditemukan</p>
+                </div>
+
+                <div class="border-b border-gray-100 bg-white flex overflow-x-auto">
+                    @php
+                        $tabs = [
+                            'all' => 'SEMUA',
+                            'waiting' => 'MENUNGGU PERSETUJUAN',
+                            'in_progress' => 'SEDANG DIKERJAKAN',
+                            'completed' => 'SELESAI',
+                            'cancelled' => 'DIBATALKAN / DITOLAK',
+                        ];
+                    @endphp
+                    @foreach($tabs as $key => $label)
+                        <a href="{{ route('tickets.index', ['tab' => $key, 'search' => request('search')]) }}" 
+                           class="whitespace-nowrap px-6 py-3.5 font-medium text-sm transition-colors duration-200 border-b-2 {{ $activeTab === $key ? 'border-brand text-brand' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                            {{ $label }} ({{ $counts[$key] ?? 0 }})
+                        </a>
+                    @endforeach
                 </div>
 
                 <div class="overflow-x-auto">
