@@ -59,11 +59,13 @@ class TicketController extends Controller
         $this->authorize('create', Ticket::class);
 
         $myAssets = Asset::where('status', 'active')
+            ->whereNull('work_unit_id')  // hanya aset individu, bukan aset unit kerja
             ->where('current_user_id', $request->user()->id)
             ->orderBy('name')
             ->get();
 
         $otherAssets = Asset::where('status', 'active')
+            ->whereNull('work_unit_id')  // hanya aset individu, bukan aset unit kerja
             ->where(function ($query) use ($request) {
                 $query->where('current_user_id', '!=', $request->user()->id)
                       ->orWhereNull('current_user_id');
