@@ -67,16 +67,16 @@ class TicketController extends Controller
 
         // Calculate counts for each tab
         $counts = [
-            'all' => (clone $baseQuery)->count(),
-            'waiting' => (clone $baseQuery)->where('status', 'waiting_approval')->count(),
-            'in_progress' => (clone $baseQuery)->whereIn('status', ['assigned', 'checking'])->count(),
-            'completed' => (clone $baseQuery)->whereIn('status', ['completed', 'closed'])->count(),
-            'cancelled' => (clone $baseQuery)->whereIn('status', ['cancelled', 'rejected'])->count(),
+            'all' => $baseQuery->clone()->count(),
+            'waiting' => $baseQuery->clone()->where('status', 'waiting_approval')->count(),
+            'in_progress' => $baseQuery->clone()->whereIn('status', ['assigned', 'checking'])->count(),
+            'completed' => $baseQuery->clone()->whereIn('status', ['completed', 'closed'])->count(),
+            'cancelled' => $baseQuery->clone()->whereIn('status', ['cancelled', 'rejected'])->count(),
         ];
 
         // Apply tab filter
         $activeTab = $request->query('tab', 'all');
-        $query = clone $baseQuery;
+        $query = $baseQuery->clone();
         
         switch ($activeTab) {
             case 'waiting':
