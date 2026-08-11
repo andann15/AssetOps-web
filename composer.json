@@ -74,9 +74,7 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": [
-                "cloudinary-labs/cloudinary-laravel"
-            ]
+            "dont-discover": []
         }
     },
     "config": {
